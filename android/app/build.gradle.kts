@@ -14,8 +14,8 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
-        buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL") ?: "\"\"}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${project.findProperty("SUPABASE_ANON_KEY") ?: "\"\"}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty(\"SUPABASE_URL\") ?: \"https://blfmtlselqhdpnowpuqj.supabase.co\"}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${project.findProperty(\"SUPABASE_ANON_KEY\") ?: \"sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK\"}\"")
     }
 
     buildTypes {

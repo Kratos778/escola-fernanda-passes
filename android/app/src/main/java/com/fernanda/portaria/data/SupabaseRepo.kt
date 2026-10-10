@@ -20,8 +20,8 @@ class SupabaseRepo(private val context: Context) {
     private val db = AppDatabase.get(context)
     val client by lazy {
         createSupabaseClient(
-            supabaseUrl = BuildConfig.SUPABASE_URL.ifBlank { "https://PLACEHOLDER.supabase.co" },
-            supabaseKey = BuildConfig.SUPABASE_ANON_KEY.ifBlank { "PLACEHOLDER" }
+            supabaseUrl = BuildConfig.SUPABASE_URL.ifBlank { "https://blfmtlselqhdpnowpuqj.supabase.co" },
+            supabaseKey = BuildConfig.SUPABASE_ANON_KEY.ifBlank { "sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK" }
         ) {
             install(Auth)
             install(Postgrest)
