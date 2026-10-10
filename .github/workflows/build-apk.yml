@@ -13,6 +13,7 @@ jobs:
     defaults:
       run:
         working-directory: android
+
     steps:
       - uses: actions/checkout@v4
 
@@ -22,27 +23,15 @@ jobs:
           java-version: '17'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Gradle wrapper
+      - name: Create Gradle Wrapper
         run: |
-          if [ ! -f gradlew ]; then
-            gradle wrapper --gradle-version 8.7 || true
-          fi
-          chmod +x gradlew 2>/dev/null || true
+          gradle wrapper --gradle-version 8.7
+          chmod +x gradlew
 
       - name: Build debug APK
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-        run: |
-          echo "SUPABASE_URL=${SUPABASE_URL}" >> gradle.properties
-          echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}" >> gradle.properties
-          if [ -f ./gradlew ]; then
-            ./gradlew assembleDebug --no-daemon
-          else
-            gradle assembleDebug --no-daemon
-          fi
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

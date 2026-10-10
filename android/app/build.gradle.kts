@@ -14,8 +14,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
-        buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty(\"SUPABASE_URL\") ?: \"https://blfmtlselqhdpnowpuqj.supabase.co\"}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${project.findProperty(\"SUPABASE_ANON_KEY\") ?: \"sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK\"}\"")
+        // Valores do projeto Colégio Fernanda (chave publishable apenas)
+        buildConfigField("String", "SUPABASE_URL", "\"https://blfmtlselqhdpnowpuqj.supabase.co\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK\"")
     }
 
     buildTypes {
@@ -23,20 +24,30 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-        debug { applicationIdSuffix = ".debug" }
+        debug {
+            applicationIdSuffix = ".debug"
+        }
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
     buildFeatures {
         compose = true
         buildConfig = true
     }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.14" }
-    packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
