@@ -27,11 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import com.fernanda.portaria.data.RespostaLeitura
 import com.fernanda.portaria.data.SupabaseRepo
 import com.fernanda.portaria.data.TipoMovimento
 import com.fernanda.portaria.scanner.QrAnalyzer
 import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
     private lateinit var repo: SupabaseRepo
@@ -63,27 +65,40 @@ fun AppPortaria(repo: SupabaseRepo) {
     if (!logado) {
         Box(Modifier.fillMaxSize().background(Color(0xFFE3F1ED)), contentAlignment = Alignment.Center) {
             Column(Modifier.padding(24.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Portaria \u2014 Escola Fernanda", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF136650))
+                Text("Portaria - Escola Fernanda", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF136650))
                 Spacer(Modifier.height(24.dp))
                 OutlinedTextField(email, { email = it }, label = { Text("Email") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(pass, { pass = it }, label = { Text("Palavra-passe") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 erro?.let { Text(it, color = Color.Red, modifier = Modifier.padding(top = 8.dp)) }
                 Spacer(Modifier.height(16.dp))
-                Button(onClick = {
-                    loading = true; erro = null
-                    scope.launch {
-                        repo.login(email.trim(), pass).onSuccess { logado = true }.onFailure { erro = it.message ?: "Falha" }
-                        loading = false
-                    }
-                }, enabled = !loading && email.isNotBlank() && pass.isNotBlank(), modifier = Modifier.fillMaxWidth()) {
-                    Text(if (loading) "A entrar\u2026" else "Entrar")
+                Button(
+                    onClick = {
+                        loading = true
+                        erro = null
+                        scope.launch {
+                            repo.login(email.trim(), pass)
+                                .onSuccess { logado = true }
+                                .onFailure { erro = it.message ?: "Falha no login" }
+                            loading = false
+                        }
+                    },
+                    enabled = !loading && email.isNotBlank() && pass.isNotBlank(),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (loading) "A entrar..." else "Entrar")
                 }
             }
         }
         return
     }
-    ScannerScreen(repo) { scope.launch { repo.logout(); logado = false } }
+
+    ScannerScreen(repo) {
+        scope.launch {
+            repo.logout()
+            logado = false
+        }
+    }
 }
 
 @Composable
@@ -93,7 +108,12 @@ fun ScannerScreen(repo: SupabaseRepo, onLogout: () -> Unit) {
     var processando by remember { mutableStateOf(false) }
     var online by remember { mutableStateOf(repo.temInternet()) }
     val scope = rememberCoroutineScope()
-    val lifecycle = LocalLifecycleOwner.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
+
+    DisposableEffect(Unit) {
+        onDispose { cameraExecutor.shutdown() }
+    }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -104,48 +124,95 @@ fun ScannerScreen(repo: SupabaseRepo, onLogout: () -> Unit) {
     }
 
     Column(Modifier.fillMaxSize().background(Color(0xFF16231E))) {
-        Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.fillMaxWidth().padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text("PORTARIA", color = Color.White, fontWeight = FontWeight.Bold)
-            Text(if (online) "ONLINE" else "OFFLINE", color = if (online) Color(0xFF4ADE80) else Color(0xFFFBBF24), fontWeight = FontWeight.Bold)
+            Text(
+                if (online) "ONLINE" else "OFFLINE",
+                color = if (online) Color(0xFF4ADE80) else Color(0xFFFBBF24),
+                fontWeight = FontWeight.Bold
+            )
             TextButton(onClick = onLogout) { Text("Sair", color = Color.White) }
         }
-        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { modo = TipoMovimento.entrada }, modifier = Modifier.weight(1f).height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = if (modo == TipoMovimento.entrada) Color(0xFF238F76) else Color(0xFF374151)),
-                shape = RoundedCornerShape(10.dp)) { Text("ENTRADA", fontWeight = FontWeight.Bold) }
-            Button(onClick = { modo = TipoMovimento.saida }, modifier = Modifier.weight(1f).height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = if (modo == TipoMovimento.saida) Color(0xFF3B82F6) else Color(0xFF374151)),
-                shape = RoundedCornerShape(10.dp)) { Text("SAIDA", fontWeight = FontWeight.Bold) }
+
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = { modo = TipoMovimento.entrada },
+                modifier = Modifier.weight(1f).height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (modo == TipoMovimento.entrada) Color(0xFF238F76) else Color(0xFF374151)
+                ),
+                shape = RoundedCornerShape(10.dp)
+            ) { Text("ENTRADA", fontWeight = FontWeight.Bold) }
+
+            Button(
+                onClick = { modo = TipoMovimento.saida },
+                modifier = Modifier.weight(1f).height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (modo == TipoMovimento.saida) Color(0xFF3B82F6) else Color(0xFF374151)
+                ),
+                shape = RoundedCornerShape(10.dp)
+            ) { Text("SAIDA", fontWeight = FontWeight.Bold) }
         }
+
         Spacer(Modifier.height(8.dp))
+
         Box(Modifier.weight(1f).fillMaxWidth().padding(12.dp)) {
-            AndroidView(factory = { c ->
-                PreviewView(c).also { previewView ->
-                    val future = ProcessCameraProvider.getInstance(c)
-                    future.addListener({
-                        val provider = future.get()
-                        val preview = Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider }
-                        val analysis = ImageAnalysis.Builder()
-                            .setTargetResolution(Size(1280, 720))
-                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
-                        analysis.setAnalyzer(ContextCompat.getMainExecutor(c), QrAnalyzer { code ->
-                            if (processando) return@QrAnalyzer
-                            processando = true
-                            scope.launch {
-                                val token = extrairToken(code)
-                                ultima = repo.registarLeitura(token, modo, offline = !repo.temInternet())
-                                processando = false
+            AndroidView(
+                factory = { ctx ->
+                    PreviewView(ctx).also { previewView ->
+                        previewView.implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                        val future = ProcessCameraProvider.getInstance(ctx)
+                        future.addListener({
+                            try {
+                                val provider = future.get()
+                                val preview = Preview.Builder().build()
+                                preview.setSurfaceProvider(previewView.surfaceProvider)
+
+                                val analysis = ImageAnalysis.Builder()
+                                    .setTargetResolution(Size(1280, 720))
+                                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                                    .build()
+
+                                analysis.setAnalyzer(cameraExecutor, QrAnalyzer { code ->
+                                    if (processando) return@QrAnalyzer
+                                    processando = true
+                                    scope.launch {
+                                        val token = extrairToken(code)
+                                        ultima = repo.registarLeitura(
+                                            token,
+                                            modo,
+                                            offline = !repo.temInternet()
+                                        )
+                                        processando = false
+                                    }
+                                })
+
+                                provider.unbindAll()
+                                provider.bindToLifecycle(
+                                    lifecycleOwner as LifecycleOwner,
+                                    CameraSelector.DEFAULT_BACK_CAMERA,
+                                    preview,
+                                    analysis
+                                )
+                            } catch (_: Exception) {
                             }
-                        })
-                        try {
-                            provider.unbindAll()
-                            provider.bindToLifecycle(lifecycle, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
-                        } catch (_: Exception) {}
-                    }, ContextCompat.getMainExecutor(c))
-                }
-            }, modifier = Modifier.fillMaxSize())
-            if (processando) CircularProgressIndicator(Modifier.align(Alignment.Center), color = Color.White)
+                        }, ContextCompat.getMainExecutor(ctx))
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+            if (processando) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center), color = Color.White)
+            }
         }
+
         val r = ultima
         val bg = when {
             r == null -> Color(0xFF1F2937)
@@ -155,9 +222,30 @@ fun ScannerScreen(repo: SupabaseRepo, onLogout: () -> Unit) {
             else -> Color(0xFF991B1B)
         }
         Column(Modifier.fillMaxWidth().background(bg).padding(16.dp)) {
-            Text(r?.mensagem ?: "Aponte ao QR do passe", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-            r?.alunoNome?.let { Text("$it  \u00b7  ${r.alunoTurma ?: ""}", color = Color.White.copy(0.9f), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
-            r?.estadoPropina?.let { Text("Propina: $it", color = Color.White.copy(0.8f), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
+            Text(
+                r?.mensagem ?: "Aponte ao QR do passe",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            r?.alunoNome?.let {
+                Text(
+                    "$it  |  ${r.alunoTurma ?: ""}",
+                    color = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+            r?.estadoPropina?.let {
+                Text(
+                    "Propina: $it",
+                    color = Color.White.copy(alpha = 0.8f),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
