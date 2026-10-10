@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel — Escola Fernanda</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--verde:#238f76;--escuro:#136650;--claro:#e3f1ed;--tinta:#16231e;--risco:#b91c1c}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;background:#d9ddd8;color:var(--tinta);padding:16px}
+.box{max-width:900px;margin:0 auto 16px;background:#fff;border-radius:14px;padding:18px;box-shadow:0 4px 14px rgba(0,0,0,.1)}
+h1{font-size:18px;color:var(--escuro);margin-bottom:12px}
+h2{font-size:15px;color:var(--escuro);margin:16px 0 8px}
+label{display:block;font-size:12px;color:#506058;margin-top:8px}
+input,select,textarea{width:100%;margin-top:4px;padding:10px;border:1.5px solid #c5d2cb;border-radius:8px;font-size:15px}
+.btn{background:var(--verde);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;margin-top:10px;margin-right:8px}
+.btn.sec{background:var(--claro);color:var(--escuro)}
+.btn.danger{background:var(--risco)}
+.dica{font-size:12px;color:#6a786f;margin-top:8px;line-height:1.4}
+.status{font-weight:600;margin-top:8px}
+.status.ok{color:var(--verde)}.status.err{color:var(--risco)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+th,td{border-bottom:1px solid #e5ebe8;padding:8px;text-align:left}
+th{color:var(--escuro)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tab{padding:8px 14px;border-radius:8px;background:var(--claro);cursor:pointer;font-weight:600;color:var(--escuro);border:0}
+.tab.on{background:var(--verde);color:#fff}
+.hidden{display:none}
+.admin-lock{background:#f8faf9;border:2px solid var(--verde);border-radius:10px;padding:14px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div class="box" id="cfg-box">
+  <h1>Configuração Supabase</h1>
+  <p class="dica">URL e chave <strong>anon</strong> (Project Settings → API). Guardados só neste navegador.</p>
+  <label>Supabase URL<input id="sb-url" placeholder="https://xxxx.supabase.co"></label>
+  <label>Anon key<input id="sb-key" placeholder="eyJ..."></label>
+  <button class="btn" type="button" id="btn-guardar-cfg">Guardar ligação</button>
+  <p class="status" id="cfg-msg"></p>
+</div>
+
+<div class="box admin-lock" id="admin-box">
+  <h1>Código de administração</h1>
+  <p class="dica">Definido <strong>uma vez</strong> neste navegador. Usado para criar alunos, emitir passes e confirmar pagamentos.</p>
+  <div id="admin-setup">
+    <label>Código (mín. 8 caracteres)<input type="password" id="admin-codigo" autocomplete="new-password"></label>
+    <label>Confirmar<input type="password" id="admin-codigo2" autocomplete="new-password"></label>
+    <button class="btn" type="button" id="btn-admin-guardar">Guardar código</button>
+  </div>
+  <div id="admin-locked" class="hidden">
+    <p class="status ok">✓ Código ativo neste navegador.</p>
+    <button class="btn sec" type="button" id="btn-admin-mostrar">Mostrar / alterar</button>
+    <button class="btn sec" type="button" id="btn-admin-apagar">Apagar local</button>
+  </div>
+  <p class="status" id="admin-msg"></p>
+</div>
+
+<div class="box" id="login-box">
+  <h1>Login funcionário</h1>
+  <label>Email<input type="email" id="email" autocomplete="username"></label>
+  <label>Palavra-passe<input type="password" id="password" autocomplete="current-password"></label>
+  <button class="btn" type="button" id="btn-login">Entrar</button>
+  <button class="btn sec hidden" type="button" id="btn-logout">Sair</button>
+  <p class="status" id="login-msg"></p>
+</div>
+
+<div class="box hidden" id="app-box">
+  <div class="tabs">
+    <button class="tab on" data-tab="alunos">Alunos / Passes</button>
+    <button class="tab" data-tab="pagamentos">Pagamentos</button>
+    <button class="tab" data-tab="movimentos">Movimentos</button>
+    <button class="tab" data-tab="estado">Estado propinas</button>
+  </div>
+
+  <section id="tab-alunos">
+    <h2>Criar aluno + passe</h2>
+    <div class="grid">
+      <label>Nome completo<input id="a-nome"></label>
+      <label>Código ID (unico)<input id="a-codigo" placeholder="Ex: ED-4526527"></label>
+      <label>Turma<input id="a-turma"></label>
+      <label>Ano letivo<input id="a-ano" placeholder="2026/2027"></label>
+      <label>Curso<input id="a-curso"></label>
+    </div>
+    <button class="btn" type="button" id="btn-criar-aluno">Criar aluno e emitir passe</button>
+    <p class="status" id="aluno-msg"></p>
+    <p class="dica">O QR do passe usa só o <strong>token</strong> devolvido. Guarda o token para imprimir no cartão.</p>
+    <pre id="aluno-resultado" class="dica" style="white-space:pre-wrap;background:#f0f4f2;padding:10px;border-radius:8px"></pre>
+  </section>
+
+  <section id="tab-pagamentos" class="hidden">
+    <h2>Confirmar pagamento</h2>
+    <label>ID do aluno (UUID)<input id="p-aluno"></label>
+    <div class="grid">
+      <label>Valor (Kz)<input id="p-valor" type="number" step="0.01" min="0"></label>
+      <label>Recibo (unico)<input id="p-recibo"></label>
+      <label>Períodos (1–12)<input id="p-periodos" type="number" value="1" min="1" max="12"></label>
+    </div>
+    <button class="btn" type="button" id="btn-pagar">Confirmar pagamento</button>
+    <p class="status" id="pag-msg"></p>
+    <pre id="pag-resultado" class="dica" style="white-space:pre-wrap;background:#f0f4f2;padding:10px;border-radius:8px"></pre>
+  </section>
+
+  <section id="tab-movimentos" class="hidden">
+    <h2>Últimos movimentos</h2>
+    <button class="btn sec" type="button" id="btn-refresh-mov">Atualizar</button>
+    <div id="mov-lista"></div>
+  </section>
+
+  <section id="tab-estado" class="hidden">
+    <h2>Estado dos alunos / propinas</h2>
+    <button class="btn sec" type="button" id="btn-refresh-est">Atualizar</button>
+    <div id="est-lista"></div>
+  </section>
+</div>
+
+<script>
+const LS = { url: 'fernanda_sb_url', key: 'fernanda_sb_key', admin: 'fernanda_admin_codigo_v1' };
+let supabase = null;
+let session = null;
+function $(id){ return document.getElementById(id); }
+function val(id){ return $(id).value.trim(); }
+function initClient(){
+  const url = localStorage.getItem(LS.url) || '';
+  const key = localStorage.getItem(LS.key) || '';
+  $('sb-url').value = url; $('sb-key').value = key;
+  if(url && key){
+    supabase = window.supabase.createClient(url, key);
+    $('cfg-msg').textContent = 'Ligação pronta.';
+    $('cfg-msg').className = 'status ok';
+  }
+}
+function adminCodigo(){ try { return localStorage.getItem(LS.admin) || ''; } catch(e){ return ''; } }
+function atualizaAdminUI(){
+  const c = adminCodigo();
+  if(c.length >= 8){ $('admin-setup').classList.add('hidden'); $('admin-locked').classList.remove('hidden'); }
+  else { $('admin-setup').classList.remove('hidden'); $('admin-locked').classList.add('hidden'); }
+}
+$('btn-guardar-cfg').onclick = () => {
+  localStorage.setItem(LS.url, val('sb-url'));
+  localStorage.setItem(LS.key, val('sb-key'));
+  initClient();
+  $('cfg-msg').textContent = 'Guardado neste navegador.';
+  $('cfg-msg').className = 'status ok';
+};
+$('btn-admin-guardar').onclick = () => {
+  const a = val('admin-codigo'), b = val('admin-codigo2');
+  if(a.length < 8){ $('admin-msg').textContent = 'Mínimo 8 caracteres.'; $('admin-msg').className = 'status err'; return; }
+  if(a !== b){ $('admin-msg').textContent = 'Não coincidem.'; $('admin-msg').className = 'status err'; return; }
+  localStorage.setItem(LS.admin, a);
+  $('admin-msg').textContent = 'Código guardado.'; $('admin-msg').className = 'status ok';
+  atualizaAdminUI();
+};
+$('btn-admin-mostrar').onclick = () => {
+  const c = adminCodigo();
+  $('admin-setup').classList.remove('hidden');
+  $('admin-codigo').value = c; $('admin-codigo2').value = c;
+};
+$('btn-admin-apagar').onclick = () => {
+  if(!confirm('Apagar código local?')) return;
+  localStorage.removeItem(LS.admin); atualizaAdminUI();
+};
+$('btn-login').onclick = async () => {
+  if(!supabase){ $('login-msg').textContent = 'Configura URL e anon key primeiro.'; $('login-msg').className = 'status err'; return; }
+  const { data, error } = await supabase.auth.signInWithPassword({ email: val('email'), password: val('password') });
+  if(error){ $('login-msg').textContent = error.message; $('login-msg').className = 'status err'; return; }
+  session = data.session;
+  $('login-msg').textContent = 'Sessão ativa.'; $('login-msg').className = 'status ok';
+  $('btn-logout').classList.remove('hidden');
+  $('app-box').classList.remove('hidden');
+};
+$('btn-logout').onclick = async () => {
+  await supabase.auth.signOut(); session = null;
+  $('app-box').classList.add('hidden'); $('btn-logout').classList.add('hidden');
+};
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    ['alunos','pagamentos','movimentos','estado'].forEach(id => {
+      $('tab-'+id).classList.toggle('hidden', t.dataset.tab !== id);
+    });
+  };
+});
+function uuid(){
+  if(crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random()*16|0, v = c==='x'?r:(r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+$('btn-criar-aluno').onclick = async () => {
+  const codigoAdmin = adminCodigo();
+  if(codigoAdmin.length < 8){ $('aluno-msg').textContent = 'Define o código de administração.'; $('aluno-msg').className = 'status err'; return; }
+  const { data, error } = await supabase.rpc('criar_aluno_e_passe', {
+    p_codigo_admin: codigoAdmin, p_nome: val('a-nome'), p_codigo_id: val('a-codigo'),
+    p_turma: val('a-turma') || null, p_ano_letivo: val('a-ano') || null, p_curso: val('a-curso') || null
+  });
+  if(error){ $('aluno-msg').textContent = error.message; $('aluno-msg').className = 'status err'; return; }
+  if(data && data.ok === false){ $('aluno-msg').textContent = data.erro || 'Falhou'; $('aluno-msg').className = 'status err'; return; }
+  $('aluno-msg').textContent = 'Aluno e passe criados.'; $('aluno-msg').className = 'status ok';
+  $('aluno-resultado').textContent = JSON.stringify(data, null, 2);
+};
+$('btn-pagar').onclick = async () => {
+  const ref = uuid();
+  const { data, error } = await supabase.rpc('confirmar_pagamento', {
+    p_aluno_id: val('p-aluno'), p_ref_transacao: ref, p_valor: parseFloat(val('p-valor')),
+    p_recibo: val('p-recibo'), p_periodos: parseInt(val('p-periodos') || '1', 10)
+  });
+  if(error){ $('pag-msg').textContent = error.message; $('pag-msg').className = 'status err'; return; }
+  $('pag-msg').textContent = data && data.repetido ? 'Transação já confirmada.' : 'Pagamento confirmado.';
+  $('pag-msg').className = 'status ok';
+  $('pag-resultado').textContent = JSON.stringify(data, null, 2);
+};
+$('btn-refresh-mov').onclick = async () => {
+  const { data, error } = await supabase.from('movimentos').select('id,tipo,resultado,ocorrido_em,offline,aluno_id').order('ocorrido_em', { ascending: false }).limit(30);
+  if(error){ $('mov-lista').innerHTML = '<p class="status err">'+error.message+'</p>'; return; }
+  let h = '<table><tr><th>Quando</th><th>Tipo</th><th>Resultado</th><th>Offline</th></tr>';
+  (data||[]).forEach(m => { h += '<tr><td>'+(m.ocorrido_em||'')+'</td><td>'+m.tipo+'</td><td>'+m.resultado+'</td><td>'+(m.offline?'sim':'não')+'</td></tr>'; });
+  h += '</table>'; $('mov-lista').innerHTML = h;
+};
+$('btn-refresh-est').onclick = async () => {
+  const { data, error } = await supabase.from('vw_estado_alunos').select('*').order('nome');
+  if(error){ $('est-lista').innerHTML = '<p class="status err">'+error.message+'</p>'; return; }
+  let h = '<table><tr><th>Nome</th><th>Turma</th><th>Propina</th><th>Vencimento</th><th>Passe</th></tr>';
+  (data||[]).forEach(a => { h += '<tr><td>'+(a.nome||'')+'</td><td>'+(a.turma||'')+'</td><td>'+(a.estado_propina||'')+'</td><td>'+(a.vencimento||'—')+'</td><td>'+(a.passe_estado||'—')+'</td></tr>'; });
+  h += '</table>'; $('est-lista').innerHTML = h;
+};
+initClient(); atualizaAdminUI();
+</script>
+</body>
+</html>
