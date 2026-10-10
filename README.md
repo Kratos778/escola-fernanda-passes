@@ -1,68 +1,46 @@
-# Sistema de Passes e Gestão de Propinas — Escola Fernanda
+# Escola Fernanda — Passes e Propinas
 
-Sistema integrado para gerir alunos, passes escolares, propinas, entradas e saídas.
-
-## Componentes
-
-| Componente | Descrição |
-|------------|-----------|
-| **Painel Web** | Administração no PC: alunos, passes, pagamentos, relatórios, auditoria |
-| **APK Portaria** | Leitura de QR Codes, registo de entradas/saídas, modo offline |
-| **Supabase** | Base de dados central (PostgreSQL), autenticação, RLS, Realtime |
-| **App Alunos** (opcional) | Passe digital e consulta do estado da propina |
-
-## Ficheiros neste repositório
+## Estrutura
 
 ```
-├── README.md
-├── docs/
-│   └── requisitos.md          # Documento completo de requisitos
-├── supabase/
-│   └── schema.sql             # Esquema completo + funções + RLS
-└── web/
-    └── passe-fernanda.html    # Gerador de carteiras / passes (impressão)
+android/          → APK Portaria (Kotlin, compilado no GitHub Actions)
+web/              → Painel HTML (Netlify / InfinityFree)
+supabase/         → Schema SQL
+.github/workflows → Build do APK
 ```
 
-## Código de administração
+## 1. Supabase
 
-No ficheiro `web/passe-fernanda.html`:
+Secrets do GitHub (Settings → Secrets → Actions):
+- `SUPABASE_URL` = https://xxxx.supabase.co
+- `SUPABASE_ANON_KEY` = eyJ...
 
-1. Abra o HTML no **Chrome**.
-2. Na secção **Código de administração**, defina um código (mín. 8 caracteres) **uma única vez**.
-3. O código fica guardado no `localStorage` do navegador e permanece fixo.
-4. Pode visualizá-lo ou apagá-lo localmente se necessário.
-
-No servidor (Supabase), o código de administração é definido **uma vez** pela função `definir_codigo_admin` (hash bcrypt). Nunca deve ser colocado em texto simples no HTML ou no APK.
-
-## Arranque rápido (Supabase)
-
-1. Crie um projeto Supabase novo.
-2. SQL Editor → cole `supabase/schema.sql` → Run.
-3. Authentication → Users → adicione o seu utilizador (email + palavra-passe).
-4. No SQL Editor, torne-o administrador:
-
+Staff admin:
 ```sql
 insert into public.staff (id, nome, papel)
 select id, 'Nome', 'admin' from auth.users where email = 'SEU@EMAIL';
+
+select public.definir_codigo_admin('SEU_CODIGO_MIN_8');
 ```
 
-5. Defina o código de administração **pelo painel** (função `definir_codigo_admin`), não pelo SQL Editor.
+## 2. HTML (Netlify / InfinityFree)
 
-## Regras principais
+Publica a pasta `web/`:
+1. Abre `index.html`
+2. Cola URL + anon key → Guardar
+3. Define código de admin (uma vez)
+4. Login com email/password do Supabase Auth
+5. Criar alunos, pagamentos, consultar propinas
 
-- QR Code contém **apenas** o token aleatório do passe (nunca dados pessoais).
-- Cada pagamento renova **30 dias** (configurável).
-- A mesma referência de transação **nunca** renova duas vezes.
-- Entradas offline ficam **pendentes de autorização** da administração.
-- Saídas podem ser registadas offline.
-- Toda a escrita passa por funções com validação no servidor (RLS ativo).
+## 3. APK Portaria
+
+1. Mete secrets `SUPABASE_URL` e `SUPABASE_ANON_KEY`
+2. Actions → **Build APK Portaria** → Run workflow
+3. Descarrega o artefacto `portaria-fernanda-apk`
+
+Funcionalidades: login staff, modo ENTRADA/SAÍDA, QR, offline+sync.
 
 ## Segurança
 
-- Nunca coloque a chave `service_role` no HTML público ou no APK.
-- Use apenas as chaves de cliente (anon / authenticated).
-- Teste todas as permissões antes de usar dados reais.
-
-## Licença
-
-Uso interno — Escola Fernanda.
+- Nunca uses `service_role` no APK nem no HTML
+- QR = só token do passe
