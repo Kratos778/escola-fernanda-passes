@@ -1,2 +1,31 @@
--- placeholder - will update
-select 1;
+-- =====================================================================
+-- Sistema de passes e propinas · Escola Fernanda
+-- SCHEMA COMPLETO disponível nos módulos desta pasta.
+--
+-- COMO INSTALAR
+--  1. Crie um projeto Supabase NOVO só para a escola.
+--  2. SQL Editor > execute os ficheiros na ordem (ver INSTALAR.md)
+--     ou o schema completo fornecido pela equipa.
+--  3. Authentication > Users > Add user (email + palavra-passe).
+--  4. Tornar administrador:
+--       insert into public.staff (id, nome, papel)
+--       select id, 'Nome', 'admin' from auth.users where email = 'SEU@EMAIL';
+--  5. Código de administração: definir UMA vez pela função
+--     definir_codigo_admin (hash bcrypt). Nunca em texto simples.
+--
+-- REGRAS
+--  · 1.º pagamento: vence 30 dias depois do dia do pagamento
+--  · Pagamentos seguintes: vencimento atual + 30 dias
+--  · Mesma ref_transacao nunca renova duas vezes
+--  · QR leva só passes.token (nunca dados pessoais)
+--  · Toda a escrita passa por funções com validação no servidor
+-- =====================================================================
+
+-- Ver ficheiros:
+--   01_header_tables.sql
+--   02_funcoes.sql
+--   03_admin.sql
+--   04_propinas.sql
+--   05_leituras.sql
+--   06_vista_seguranca.sql
+--   INSTALAR.md
