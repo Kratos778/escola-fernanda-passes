@@ -1,0 +1,29 @@
+package com.fernanda.portaria.data
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.util.UUID
+
+enum class TipoMovimento { entrada, saida }
+
+@Entity(tableName = "eventos_pendentes")
+data class EventoPendente(
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val token: String,
+    val tipo: String,
+    val ocorridoEm: Long = System.currentTimeMillis(),
+    val decisaoLocal: String? = null,
+    val sincronizado: Boolean = false
+)
+
+data class RespostaLeitura(
+    val ok: Boolean = false,
+    val mensagem: String = "",
+    val resultado: String = "",
+    val tipo: String = "",
+    val alunoNome: String? = null,
+    val alunoTurma: String? = null,
+    val estadoPropina: String? = null,
+    val offline: Boolean = false,
+    val repetido: Boolean = false
+)
