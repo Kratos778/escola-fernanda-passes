@@ -36,23 +36,23 @@ th{color:var(--escuro)}
 
 <div class="box" id="cfg-box">
   <h1>Configuração Supabase</h1>
-  <p class="dica">URL e chave <strong>anon</strong> (Project Settings → API). Guardados só neste navegador.</p>
-  <label>Supabase URL<input id="sb-url" placeholder="https://xxxx.supabase.co"></label>
-  <label>Anon key<input id="sb-key" placeholder="eyJ..."></label>
+  <p class="dica">URL e chave publishable já preenchidas. Clica em Guardar ligação.</p>
+  <label>Supabase URL<input id="sb-url" value="https://blfmtlselqhdpnowpuqj.supabase.co"></label>
+  <label>Anon / publishable key<input id="sb-key" value="sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK"></label>
   <button class="btn" type="button" id="btn-guardar-cfg">Guardar ligação</button>
   <p class="status" id="cfg-msg"></p>
 </div>
 
 <div class="box admin-lock" id="admin-box">
   <h1>Código de administração</h1>
-  <p class="dica">Definido <strong>uma vez</strong> neste navegador. Usado para criar alunos, emitir passes e confirmar pagamentos.</p>
+  <p class="dica">Definido <strong>uma vez</strong> neste navegador.</p>
   <div id="admin-setup">
-    <label>Código (mín. 8 caracteres)<input type="password" id="admin-codigo" autocomplete="new-password"></label>
+    <label>Código (mín. 8)<input type="password" id="admin-codigo" autocomplete="new-password"></label>
     <label>Confirmar<input type="password" id="admin-codigo2" autocomplete="new-password"></label>
     <button class="btn" type="button" id="btn-admin-guardar">Guardar código</button>
   </div>
   <div id="admin-locked" class="hidden">
-    <p class="status ok">✓ Código ativo neste navegador.</p>
+    <p class="status ok">✓ Código ativo.</p>
     <button class="btn sec" type="button" id="btn-admin-mostrar">Mostrar / alterar</button>
     <button class="btn sec" type="button" id="btn-admin-apagar">Apagar local</button>
   </div>
@@ -75,43 +75,38 @@ th{color:var(--escuro)}
     <button class="tab" data-tab="movimentos">Movimentos</button>
     <button class="tab" data-tab="estado">Estado propinas</button>
   </div>
-
   <section id="tab-alunos">
     <h2>Criar aluno + passe</h2>
     <div class="grid">
-      <label>Nome completo<input id="a-nome"></label>
-      <label>Código ID (unico)<input id="a-codigo" placeholder="Ex: ED-4526527"></label>
+      <label>Nome<input id="a-nome"></label>
+      <label>Código ID<input id="a-codigo"></label>
       <label>Turma<input id="a-turma"></label>
-      <label>Ano letivo<input id="a-ano" placeholder="2026/2027"></label>
+      <label>Ano letivo<input id="a-ano"></label>
       <label>Curso<input id="a-curso"></label>
     </div>
     <button class="btn" type="button" id="btn-criar-aluno">Criar aluno e emitir passe</button>
     <p class="status" id="aluno-msg"></p>
-    <p class="dica">O QR do passe usa só o <strong>token</strong> devolvido. Guarda o token para imprimir no cartão.</p>
     <pre id="aluno-resultado" class="dica" style="white-space:pre-wrap;background:#f0f4f2;padding:10px;border-radius:8px"></pre>
   </section>
-
   <section id="tab-pagamentos" class="hidden">
     <h2>Confirmar pagamento</h2>
-    <label>ID do aluno (UUID)<input id="p-aluno"></label>
+    <label>ID aluno (UUID)<input id="p-aluno"></label>
     <div class="grid">
-      <label>Valor (Kz)<input id="p-valor" type="number" step="0.01" min="0"></label>
-      <label>Recibo (unico)<input id="p-recibo"></label>
-      <label>Períodos (1–12)<input id="p-periodos" type="number" value="1" min="1" max="12"></label>
+      <label>Valor<input id="p-valor" type="number" step="0.01"></label>
+      <label>Recibo<input id="p-recibo"></label>
+      <label>Períodos<input id="p-periodos" type="number" value="1" min="1" max="12"></label>
     </div>
-    <button class="btn" type="button" id="btn-pagar">Confirmar pagamento</button>
+    <button class="btn" type="button" id="btn-pagar">Confirmar</button>
     <p class="status" id="pag-msg"></p>
     <pre id="pag-resultado" class="dica" style="white-space:pre-wrap;background:#f0f4f2;padding:10px;border-radius:8px"></pre>
   </section>
-
   <section id="tab-movimentos" class="hidden">
-    <h2>Últimos movimentos</h2>
+    <h2>Movimentos</h2>
     <button class="btn sec" type="button" id="btn-refresh-mov">Atualizar</button>
     <div id="mov-lista"></div>
   </section>
-
   <section id="tab-estado" class="hidden">
-    <h2>Estado dos alunos / propinas</h2>
+    <h2>Estado propinas</h2>
     <button class="btn sec" type="button" id="btn-refresh-est">Atualizar</button>
     <div id="est-lista"></div>
   </section>
@@ -119,13 +114,14 @@ th{color:var(--escuro)}
 
 <script>
 const LS = { url: 'fernanda_sb_url', key: 'fernanda_sb_key', admin: 'fernanda_admin_codigo_v1' };
+const DEFAULT_URL = 'https://blfmtlselqhdpnowpuqj.supabase.co';
+const DEFAULT_KEY = 'sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK';
 let supabase = null;
-let session = null;
 function $(id){ return document.getElementById(id); }
 function val(id){ return $(id).value.trim(); }
 function initClient(){
-  const url = localStorage.getItem(LS.url) || '';
-  const key = localStorage.getItem(LS.key) || '';
+  const url = localStorage.getItem(LS.url) || DEFAULT_URL;
+  const key = localStorage.getItem(LS.key) || DEFAULT_KEY;
   $('sb-url').value = url; $('sb-key').value = key;
   if(url && key){
     supabase = window.supabase.createClient(url, key);
@@ -143,15 +139,14 @@ $('btn-guardar-cfg').onclick = () => {
   localStorage.setItem(LS.url, val('sb-url'));
   localStorage.setItem(LS.key, val('sb-key'));
   initClient();
-  $('cfg-msg').textContent = 'Guardado neste navegador.';
-  $('cfg-msg').className = 'status ok';
+  $('cfg-msg').textContent = 'Guardado.'; $('cfg-msg').className = 'status ok';
 };
 $('btn-admin-guardar').onclick = () => {
   const a = val('admin-codigo'), b = val('admin-codigo2');
-  if(a.length < 8){ $('admin-msg').textContent = 'Mínimo 8 caracteres.'; $('admin-msg').className = 'status err'; return; }
+  if(a.length < 8){ $('admin-msg').textContent = 'Mínimo 8.'; $('admin-msg').className = 'status err'; return; }
   if(a !== b){ $('admin-msg').textContent = 'Não coincidem.'; $('admin-msg').className = 'status err'; return; }
   localStorage.setItem(LS.admin, a);
-  $('admin-msg').textContent = 'Código guardado.'; $('admin-msg').className = 'status ok';
+  $('admin-msg').textContent = 'OK'; $('admin-msg').className = 'status ok';
   atualizaAdminUI();
 };
 $('btn-admin-mostrar').onclick = () => {
@@ -160,20 +155,19 @@ $('btn-admin-mostrar').onclick = () => {
   $('admin-codigo').value = c; $('admin-codigo2').value = c;
 };
 $('btn-admin-apagar').onclick = () => {
-  if(!confirm('Apagar código local?')) return;
+  if(!confirm('Apagar?')) return;
   localStorage.removeItem(LS.admin); atualizaAdminUI();
 };
 $('btn-login').onclick = async () => {
-  if(!supabase){ $('login-msg').textContent = 'Configura URL e anon key primeiro.'; $('login-msg').className = 'status err'; return; }
+  if(!supabase) initClient();
   const { data, error } = await supabase.auth.signInWithPassword({ email: val('email'), password: val('password') });
   if(error){ $('login-msg').textContent = error.message; $('login-msg').className = 'status err'; return; }
-  session = data.session;
   $('login-msg').textContent = 'Sessão ativa.'; $('login-msg').className = 'status ok';
   $('btn-logout').classList.remove('hidden');
   $('app-box').classList.remove('hidden');
 };
 $('btn-logout').onclick = async () => {
-  await supabase.auth.signOut(); session = null;
+  await supabase.auth.signOut();
   $('app-box').classList.add('hidden'); $('btn-logout').classList.add('hidden');
 };
 document.querySelectorAll('.tab').forEach(t => {
@@ -194,40 +188,39 @@ function uuid(){
 }
 $('btn-criar-aluno').onclick = async () => {
   const codigoAdmin = adminCodigo();
-  if(codigoAdmin.length < 8){ $('aluno-msg').textContent = 'Define o código de administração.'; $('aluno-msg').className = 'status err'; return; }
+  if(codigoAdmin.length < 8){ $('aluno-msg').textContent = 'Define código admin.'; $('aluno-msg').className = 'status err'; return; }
   const { data, error } = await supabase.rpc('criar_aluno_e_passe', {
     p_codigo_admin: codigoAdmin, p_nome: val('a-nome'), p_codigo_id: val('a-codigo'),
     p_turma: val('a-turma') || null, p_ano_letivo: val('a-ano') || null, p_curso: val('a-curso') || null
   });
   if(error){ $('aluno-msg').textContent = error.message; $('aluno-msg').className = 'status err'; return; }
   if(data && data.ok === false){ $('aluno-msg').textContent = data.erro || 'Falhou'; $('aluno-msg').className = 'status err'; return; }
-  $('aluno-msg').textContent = 'Aluno e passe criados.'; $('aluno-msg').className = 'status ok';
+  $('aluno-msg').textContent = 'Criado.'; $('aluno-msg').className = 'status ok';
   $('aluno-resultado').textContent = JSON.stringify(data, null, 2);
 };
 $('btn-pagar').onclick = async () => {
-  const ref = uuid();
   const { data, error } = await supabase.rpc('confirmar_pagamento', {
-    p_aluno_id: val('p-aluno'), p_ref_transacao: ref, p_valor: parseFloat(val('p-valor')),
+    p_aluno_id: val('p-aluno'), p_ref_transacao: uuid(), p_valor: parseFloat(val('p-valor')),
     p_recibo: val('p-recibo'), p_periodos: parseInt(val('p-periodos') || '1', 10)
   });
   if(error){ $('pag-msg').textContent = error.message; $('pag-msg').className = 'status err'; return; }
-  $('pag-msg').textContent = data && data.repetido ? 'Transação já confirmada.' : 'Pagamento confirmado.';
+  $('pag-msg').textContent = data && data.repetido ? 'Já confirmado.' : 'OK';
   $('pag-msg').className = 'status ok';
   $('pag-resultado').textContent = JSON.stringify(data, null, 2);
 };
 $('btn-refresh-mov').onclick = async () => {
-  const { data, error } = await supabase.from('movimentos').select('id,tipo,resultado,ocorrido_em,offline,aluno_id').order('ocorrido_em', { ascending: false }).limit(30);
-  if(error){ $('mov-lista').innerHTML = '<p class="status err">'+error.message+'</p>'; return; }
+  const { data, error } = await supabase.from('movimentos').select('id,tipo,resultado,ocorrido_em,offline').order('ocorrido_em', { ascending: false }).limit(30);
+  if(error){ $('mov-lista').innerHTML = error.message; return; }
   let h = '<table><tr><th>Quando</th><th>Tipo</th><th>Resultado</th><th>Offline</th></tr>';
   (data||[]).forEach(m => { h += '<tr><td>'+(m.ocorrido_em||'')+'</td><td>'+m.tipo+'</td><td>'+m.resultado+'</td><td>'+(m.offline?'sim':'não')+'</td></tr>'; });
-  h += '</table>'; $('mov-lista').innerHTML = h;
+  $('mov-lista').innerHTML = h + '</table>';
 };
 $('btn-refresh-est').onclick = async () => {
   const { data, error } = await supabase.from('vw_estado_alunos').select('*').order('nome');
-  if(error){ $('est-lista').innerHTML = '<p class="status err">'+error.message+'</p>'; return; }
+  if(error){ $('est-lista').innerHTML = error.message; return; }
   let h = '<table><tr><th>Nome</th><th>Turma</th><th>Propina</th><th>Vencimento</th><th>Passe</th></tr>';
   (data||[]).forEach(a => { h += '<tr><td>'+(a.nome||'')+'</td><td>'+(a.turma||'')+'</td><td>'+(a.estado_propina||'')+'</td><td>'+(a.vencimento||'—')+'</td><td>'+(a.passe_estado||'—')+'</td></tr>'; });
-  h += '</table>'; $('est-lista').innerHTML = h;
+  $('est-lista').innerHTML = h + '</table>';
 };
 initClient(); atualizaAdminUI();
 </script>
