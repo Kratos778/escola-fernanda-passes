@@ -23,7 +23,19 @@ data class RespostaLeitura(
     val tipo: String = "",
     val alunoNome: String? = null,
     val alunoTurma: String? = null,
+    val alunoCurso: String? = null,
+    val alunoCodigo: String? = null,
+    val numeroPasse: String? = null,
     val estadoPropina: String? = null,
+    val passeEstado: String? = null,
+    val vencimento: String? = null,
     val offline: Boolean = false,
-    val repetido: Boolean = false
-)
+    val repetido: Boolean = false,
+    val ocorridoEm: String? = null
+) {
+    val mostrarAvisoPropina: Boolean
+        get() = when (estadoPropina) {
+            null, "em_dia" -> false
+            else -> true
+        }
+}
