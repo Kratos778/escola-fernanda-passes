@@ -43,28 +43,46 @@ class SupabaseRepo(private val context: Context) {
     fun sessaoAtiva() = client.auth.currentSessionOrNull() != null
 
     suspend fun registarLeitura(
-        token: String, tipo: TipoMovimento, offline: Boolean = false,
-        decisaoLocal: String? = null, eventoId: String = UUID.randomUUID().toString()
+        token: String,
+        tipo: TipoMovimento,
+        offline: Boolean = false,
+        decisaoLocal: String? = null,
+        eventoId: String = UUID.randomUUID().toString()
     ): RespostaLeitura {
         if (!temInternet() || offline) {
-            db.eventoDao().inserir(EventoPendente(id = eventoId, token = token, tipo = tipo.name, decisaoLocal = decisaoLocal))
+            db.eventoDao().inserir(
+                EventoPendente(id = eventoId, token = token, tipo = tipo.name, decisaoLocal = decisaoLocal)
+            )
             return RespostaLeitura(
                 ok = true,
-                mensagem = if (tipo == TipoMovimento.saida) "Saida guardada offline" else "EVENTO GUARDADO OFFLINE",
+                mensagem = if (tipo == TipoMovimento.saida) "SAIDA REGISTADA (OFFLINE)"
+                else "EVENTO GUARDADO OFFLINE — VERIFICACAO PENDENTE",
                 resultado = if (tipo == TipoMovimento.saida) "permitido" else "pendente_autorizacao",
-                tipo = tipo.name, offline = true
+                tipo = tipo.name,
+                offline = true
             )
         }
         return runCatching {
             val params = buildJsonObject {
-                put("p_evento_id", eventoId); put("p_token", token); put("p_tipo", tipo.name)
-                put("p_ocorrido_em", Instant.now().toString()); put("p_offline", false)
+                put("p_evento_id", eventoId)
+                put("p_token", token)
+                put("p_tipo", tipo.name)
+                put("p_ocorrido_em", Instant.now().toString())
+                put("p_offline", false)
                 if (decisaoLocal != null) put("p_decisao_local", decisaoLocal)
             }
             parseResposta(client.postgrest.rpc("registar_leitura", params).data)
         }.getOrElse {
-            db.eventoDao().inserir(EventoPendente(id = eventoId, token = token, tipo = tipo.name, decisaoLocal = decisaoLocal))
-            RespostaLeitura(ok = true, mensagem = "EVENTO GUARDADO OFFLINE", resultado = "pendente_autorizacao", tipo = tipo.name, offline = true)
+            db.eventoDao().inserir(
+                EventoPendente(id = eventoId, token = token, tipo = tipo.name, decisaoLocal = decisaoLocal)
+            )
+            RespostaLeitura(
+                ok = true,
+                mensagem = "EVENTO GUARDADO OFFLINE — VERIFICACAO PENDENTE",
+                resultado = "pendente_autorizacao",
+                tipo = tipo.name,
+                offline = true
+            )
         }
     }
 
@@ -74,22 +92,44 @@ class SupabaseRepo(private val context: Context) {
         for (e in db.eventoDao().pendentes()) {
             runCatching {
                 val params = buildJsonObject {
-                    put("p_evento_id", e.id); put("p_token", e.token); put("p_tipo", e.tipo)
-                    put("p_ocorrido_em", Instant.ofEpochMilli(e.ocorridoEm).toString()); put("p_offline", true)
+                    put("p_evento_id", e.id)
+                    put("p_token", e.token)
+                    put("p_tipo", e.tipo)
+                    put("p_ocorrido_em", Instant.ofEpochMilli(e.ocorridoEm).toString())
+                    put("p_offline", true)
                     e.decisaoLocal?.let { put("p_decisao_local", it) }
                 }
                 client.postgrest.rpc("registar_leitura", params)
-                db.eventoDao().marcarSincronizado(e.id); n++
+                db.eventoDao().marcarSincronizado(e.id)
+                n++
             }
         }
         return n
     }
 
     private fun parseResposta(raw: String): RespostaLeitura {
-        fun g(k: String) = Regex("\"$k\"\\s*:\\s*\"([^\"]*)\"").find(raw)?.groupValues?.get(1)
+        fun g(k: String): String? =
+            Regex("\"$k\"\\s*:\\s*\"([^\"]*)\"").find(raw)?.groupValues?.get(1)
+        fun nested(parent: String, k: String): String? =
+            Regex("\"$parent\"\\s*:\\s*\\{[^}]*\"$k\"\\s*:\\s*\"([^\"]*)\"").find(raw)?.groupValues?.get(1)
+
+        val res = g("resultado") ?: ""
         return RespostaLeitura(
-            ok = true, mensagem = g("mensagem") ?: "Resposta", resultado = g("resultado") ?: "",
-            tipo = g("tipo") ?: "", alunoNome = g("nome"), alunoTurma = g("turma"), estadoPropina = g("estado_propina")
+            ok = true,
+            mensagem = g("mensagem") ?: "Resposta",
+            resultado = res,
+            tipo = g("tipo") ?: "",
+            alunoNome = nested("aluno", "nome") ?: g("nome"),
+            alunoTurma = nested("aluno", "turma") ?: g("turma"),
+            alunoCurso = nested("aluno", "curso"),
+            alunoCodigo = nested("aluno", "codigo_id"),
+            numeroPasse = nested("aluno", "numero_passe"),
+            estadoPropina = g("estado_propina"),
+            passeEstado = g("passe_estado"),
+            vencimento = nested("aluno", "vencimento") ?: g("vencimento"),
+            offline = raw.contains("\"offline\":true") || raw.contains("\"offline\": true"),
+            repetido = res == "duplicado",
+            ocorridoEm = g("ocorrido_em")
         )
     }
 }
