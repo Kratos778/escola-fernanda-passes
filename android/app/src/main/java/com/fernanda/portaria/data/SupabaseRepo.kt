@@ -70,6 +70,7 @@ class SupabaseRepo(private val context: Context) {
             val params = buildJsonObject {
                 put("p_evento_id", eventoId)
                 put("p_token", token)
+                put("p_codigo", token)
                 put("p_tipo", tipo.name)
                 put("p_ocorrido_em", Instant.now().toString())
                 put("p_offline", false)
@@ -99,6 +100,7 @@ class SupabaseRepo(private val context: Context) {
                 val params = buildJsonObject {
                     put("p_evento_id", e.id)
                     put("p_token", e.token)
+                    put("p_codigo", e.token)
                     put("p_tipo", e.tipo)
                     put("p_ocorrido_em", Instant.ofEpochMilli(e.ocorridoEm).toString())
                     put("p_offline", true)
