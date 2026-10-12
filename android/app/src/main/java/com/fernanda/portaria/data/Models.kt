@@ -29,6 +29,7 @@ data class RespostaLeitura(
     val estadoPropina: String? = null,
     val passeEstado: String? = null,
     val vencimento: String? = null,
+    val fotoPath: String? = null,
     val offline: Boolean = false,
     val repetido: Boolean = false,
     val ocorridoEm: String? = null
@@ -39,3 +40,18 @@ data class RespostaLeitura(
             else -> true
         }
 }
+
+data class MovimentoItem(
+    val id: String = "",
+    val tipo: String = "",
+    val resultado: String = "",
+    val offline: Boolean = false,
+    val ocorridoEm: String = "",
+    val alunoNome: String? = null,
+    val alunoTurma: String? = null,
+    val alunoCurso: String? = null,
+    val alunoCodigo: String? = null,
+    val numeroPasse: String? = null,
+    val passeEstado: String? = null,
+    val fotoPath: String? = null
+)
