@@ -12,8 +12,8 @@ android {
         applicationId = "com.fernanda.portaria"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.3.0"
+        versionCode = 4
+        versionName = "1.4.0"
         buildConfigField("String", "SUPABASE_URL", "\"https://blfmtlselqhdpnowpuqj.supabase.co\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK\"")
     }
