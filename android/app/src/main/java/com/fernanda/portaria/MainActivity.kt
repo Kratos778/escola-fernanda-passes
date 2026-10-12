@@ -22,6 +22,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
@@ -30,12 +31,15 @@ import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -45,8 +49,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import coil.compose.AsyncImage
 import com.fernanda.portaria.data.AppDatabase
 import com.fernanda.portaria.data.EventoPendente
+import com.fernanda.portaria.data.MovimentoItem
 import com.fernanda.portaria.data.RespostaLeitura
 import com.fernanda.portaria.data.SupabaseRepo
 import com.fernanda.portaria.data.TipoMovimento
@@ -86,7 +92,7 @@ fun AppPortaria(repo: SupabaseRepo) {
     var loading by remember { mutableStateOf(false) }
     var aba by remember { mutableStateOf(Aba.Scanner) }
     val scope = rememberCoroutineScope()
-    val historico = remember { mutableStateListOf<RespostaLeitura>() }
+    val historicoSessao = remember { mutableStateListOf<RespostaLeitura>() }
     val ctx = LocalContext.current
 
     if (!logado) {
@@ -122,11 +128,11 @@ fun AppPortaria(repo: SupabaseRepo) {
         Box(Modifier.padding(pad).fillMaxSize()) {
             when (aba) {
                 Aba.Scanner -> ScannerTab(repo, ctx) { r ->
-                    historico.add(0, r)
-                    if (historico.size > 100) historico.removeLast()
+                    historicoSessao.add(0, r)
+                    if (historicoSessao.size > 100) historicoSessao.removeLast()
                     vibrar(ctx, r)
                 }
-                Aba.Historico -> HistoricoTab(historico)
+                Aba.Historico -> HistoricoTab(repo, historicoSessao)
                 Aba.Pendentes -> PendentesTab(repo)
                 Aba.Conta -> ContaTab(repo) { scope.launch { repo.logout(); logado = false } }
             }
@@ -163,7 +169,7 @@ fun LoginScreen(email: String, pass: String, erro: String?, loading: Boolean, on
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF238F76))) {
                 Text(if (loading) "A entrar..." else "Entrar")
             }
-            Text("Authentication > Users > Add user (password nova, nao Gmail)", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 16.dp), textAlign = TextAlign.Center)
+            Text("Authentication > Users > Add user (password nova)", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 16.dp), textAlign = TextAlign.Center)
         }
     }
 }
@@ -261,9 +267,22 @@ fun ResultadoPanel(r: RespostaLeitura?) {
         else -> Color(0xFF991B1B)
     }
     Column(Modifier.fillMaxWidth().background(bg).padding(14.dp)) {
-        Text(r?.mensagem ?: "Escolha ENTRADA ou SAIDA e aponte ao QR",
-            color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            if (!r?.fotoPath.isNullOrBlank()) {
+                AsyncImage(
+                    model = r!!.fotoPath,
+                    contentDescription = "Foto aluno",
+                    modifier = Modifier.size(56.dp).clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(Modifier.width(12.dp))
+            }
+            Column(Modifier.weight(1f)) {
+                Text(r?.mensagem ?: "Escolha ENTRADA ou SAIDA e aponte ao QR",
+                    color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                r?.tipo?.let { Text(it.uppercase(), color = Color.White.copy(0.85f), fontSize = 12.sp) }
+            }
+        }
         if (r?.mostrarAvisoPropina == true) {
             Spacer(Modifier.height(8.dp))
             Surface(color = Color(0xFFFBBF24), shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth()) {
@@ -272,10 +291,9 @@ fun ResultadoPanel(r: RespostaLeitura?) {
                     textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp).fillMaxWidth())
             }
         }
-        r?.tipo?.let { Text(it.uppercase(), color = Color.White.copy(0.85f), fontSize = 13.sp,
-            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) }
-        r?.alunoNome?.let { Text(it, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp,
-            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) }
+        r?.alunoNome?.let {
+            Text(it, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.padding(top = 6.dp))
+        }
         val detalhes = listOfNotNull(
             r?.alunoCodigo?.let { "ID: $it" },
             r?.alunoTurma?.let { "Turma: $it" },
@@ -286,34 +304,83 @@ fun ResultadoPanel(r: RespostaLeitura?) {
             r?.vencimento?.let { "Venc.: $it" }
         ).joinToString(" · ")
         if (detalhes.isNotBlank()) {
-            Text(detalhes, color = Color.White.copy(0.85f), fontSize = 12.sp,
-                textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
+            Text(detalhes, color = Color.White.copy(0.85f), fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
         }
     }
 }
 
 @Composable
-fun HistoricoTab(items: List<RespostaLeitura>) {
+fun HistoricoTab(repo: SupabaseRepo, sessao: List<RespostaLeitura>) {
+    var servidor by remember { mutableStateOf<List<MovimentoItem>>(emptyList()) }
+    var loading by remember { mutableStateOf(false) }
+    var erro by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    fun carregar() {
+        loading = true; erro = null
+        scope.launch {
+            servidor = repo.listarHistoricoServidor(80)
+            if (servidor.isEmpty() && !repo.temInternet()) erro = "Sem rede — so sessao local"
+            loading = false
+        }
+    }
+    LaunchedEffect(Unit) { carregar() }
+
     Column(Modifier.fillMaxSize().background(Color(0xFFF5F7F6)).padding(12.dp)) {
-        Text("Historico desta sessao", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF136650))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Column {
+                Text("Historico", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF136650))
+                Text("Servidor + sessao local", fontSize = 12.sp, color = Color.Gray)
+            }
+            IconButton(onClick = { carregar() }, enabled = !loading) {
+                Icon(if (loading) Icons.Default.Sync else Icons.Default.Refresh, null, tint = Color(0xFF136650))
+            }
+        }
+        erro?.let { Text(it, color = Color(0xFFB45309), fontSize = 12.sp) }
         Spacer(Modifier.height(8.dp))
-        if (items.isEmpty()) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Ainda sem leituras", color = Color.Gray) }
-        else LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(items) { r ->
-                val cor = when {
-                    r.offline -> Color(0xFF92400E)
-                    r.resultado in listOf("permitido", "autorizado_manual") -> Color(0xFF166534)
-                    r.resultado == "duplicado" -> Color(0xFF6B7280)
-                    else -> Color(0xFF991B1B)
-                }
-                Card(colors = CardDefaults.cardColors(containerColor = Color.White)) {
-                    Column(Modifier.padding(12.dp)) {
-                        Text(r.mensagem, fontWeight = FontWeight.SemiBold, color = cor)
-                        Text("${r.tipo.uppercase()} · ${r.resultado}" + (r.alunoNome?.let { " · $it" } ?: ""), fontSize = 13.sp)
-                        if (r.mostrarAvisoPropina) Text("Propina: ${r.estadoPropina}", fontSize = 12.sp, color = Color(0xFFB45309))
-                    }
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (sessao.isNotEmpty()) {
+                item { Text("Nesta sessao", fontWeight = FontWeight.SemiBold, color = Color(0xFF136650), fontSize = 13.sp) }
+                items(sessao.take(20)) { r ->
+                    HistoricoCard(
+                        titulo = r.mensagem,
+                        sub = "${r.tipo.uppercase()} · ${r.resultado}" + (r.alunoNome?.let { " · $it" } ?: ""),
+                        aviso = r.mostrarAvisoPropina,
+                        offline = r.offline,
+                        ok = r.resultado in listOf("permitido", "autorizado_manual")
+                    )
                 }
             }
+            item { Text("No servidor", fontWeight = FontWeight.SemiBold, color = Color(0xFF136650), fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) }
+            if (servidor.isEmpty() && !loading) {
+                item { Text("Sem registos no servidor (corre o patch SQL)", color = Color.Gray, fontSize = 13.sp) }
+            }
+            items(servidor) { m ->
+                HistoricoCard(
+                    titulo = "${m.tipo.uppercase()} · ${m.resultado}",
+                    sub = listOfNotNull(m.alunoNome, m.alunoTurma, m.ocorridoEm.take(19).replace('T', ' ')).joinToString(" · "),
+                    aviso = false,
+                    offline = m.offline,
+                    ok = m.resultado in listOf("permitido", "autorizado_manual")
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun HistoricoCard(titulo: String, sub: String, aviso: Boolean, offline: Boolean, ok: Boolean) {
+    val cor = when {
+        offline -> Color(0xFF92400E)
+        ok -> Color(0xFF166534)
+        else -> Color(0xFF991B1B)
+    }
+    Card(colors = CardDefaults.cardColors(containerColor = Color.White)) {
+        Column(Modifier.padding(12.dp)) {
+            Text(titulo, fontWeight = FontWeight.SemiBold, color = cor, fontSize = 14.sp)
+            Text(sub, fontSize = 12.sp, color = Color(0xFF374151))
+            if (aviso) Text("Propina: aviso", fontSize = 12.sp, color = Color(0xFFB45309))
+            if (offline) Text("OFFLINE", fontSize = 11.sp, color = Color(0xFFB45309))
         }
     }
 }
@@ -378,7 +445,7 @@ fun ContaTab(repo: SupabaseRepo, onLogout: () -> Unit) {
         Spacer(Modifier.height(20.dp))
         Button(onClick = onLogout, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB91C1C)),
             modifier = Modifier.fillMaxWidth().height(48.dp)) { Text("Terminar sessao") }
-        Text("Escola Fernanda · Portaria v1.2", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 24.dp))
+        Text("Escola Fernanda · Portaria v1.3", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 24.dp))
     }
 }
 
