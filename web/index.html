@@ -102,7 +102,6 @@ code{font-size:12px;background:#f0f4f2;padding:2px 6px;border-radius:4px}
 </style>
 </head>
 <body>
-
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">EF</div>
@@ -121,7 +120,6 @@ code{font-size:12px;background:#f0f4f2;padding:2px 6px;border-radius:4px}
     <p class="login-hint">Conta do Supabase Authentication (a mesma do app da portaria)</p>
   </div>
 </div>
-
 <div id="app-screen" class="hidden">
   <header class="topbar">
     <div>
@@ -137,7 +135,6 @@ code{font-size:12px;background:#f0f4f2;padding:2px 6px;border-radius:4px}
     <button type="button" data-tab="admin">Admin</button>
   </nav>
   <div class="main">
-
     <section id="tab-alunos">
       <div class="card">
         <h2>Novo aluno e passe</h2>
@@ -175,7 +172,6 @@ code{font-size:12px;background:#f0f4f2;padding:2px 6px;border-radius:4px}
         <div class="toast" id="a-toast"></div>
         <div class="result-box" id="a-result"></div>
       </div>
-
       <div class="card">
         <h2>Lista de alunos</h2>
         <p class="hint">Propina e passe activo. Botão “ID propina” leva-te ao pagamento.</p>
@@ -192,7 +188,6 @@ code{font-size:12px;background:#f0f4f2;padding:2px 6px;border-radius:4px}
         </div>
       </div>
     </section>
-
     <section id="tab-propinas" class="hidden">
       <div class="card">
         <h2>Confirmar pagamento</h2>
@@ -221,7 +216,6 @@ code{font-size:12px;background:#f0f4f2;padding:2px 6px;border-radius:4px}
         <div class="toast" id="p-toast"></div>
       </div>
     </section>
-
     <section id="tab-movimentos" class="hidden">
       <div class="card">
         <h2>Últimas passagens</h2>
@@ -239,7 +233,6 @@ code{font-size:12px;background:#f0f4f2;padding:2px 6px;border-radius:4px}
         </div>
       </div>
     </section>
-
     <section id="tab-admin" class="hidden">
       <div class="card">
         <h2>Código de administração</h2>
@@ -256,11 +249,18 @@ code{font-size:12px;background:#f0f4f2;padding:2px 6px;border-radius:4px}
     </section>
   </div>
 </div>
-
 <script>
 const sb = supabase.createClient(
   'https://blfmtlselqhdpnowpuqj.supabase.co',
-  'sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK'
+  'sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK',
+  {
+    auth: {
+      storage: window.sessionStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
 );
 const $ = (id) => document.getElementById(id);
 function toast(el, text, tipo) {
@@ -287,7 +287,6 @@ function idDoNome(nome){
   return ini+'-'+d;
 }
 function pad9(n){return String(n==null?'':n).replace(/\D/g,'').padStart(9,'0').slice(-9)}
-
 async function goApp(session){
   $('login-screen').classList.add('hidden');
   $('app-screen').classList.remove('hidden');
@@ -302,7 +301,6 @@ async function boot(){
   const {data:{session}}=await sb.auth.getSession();
   if(session) await goApp(session); else goLogin();
 }
-
 $('btn-login').onclick=async()=>{
   const err=$('login-err');
   err.classList.add('hidden');
@@ -315,7 +313,6 @@ $('btn-login').onclick=async()=>{
   await goApp(data.session);
 };
 $('btn-logout').onclick=async()=>{await sb.auth.signOut();goLogin()};
-
 document.querySelectorAll('.tabs button').forEach(btn=>{
   btn.onclick=()=>{
     document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));
@@ -327,7 +324,6 @@ document.querySelectorAll('.tabs button').forEach(btn=>{
     if(btn.dataset.tab==='alunos') carregarAlunos();
   };
 });
-
 $('btn-gen-id').onclick=()=>{$('a-codigo-id').value=idDoNome($('a-nome').value)};
 $('btn-criar').onclick=async()=>{
   const t=$('a-toast'), box=$('a-result');
@@ -352,7 +348,6 @@ $('btn-criar').onclick=async()=>{
   $('p-aluno').value=data.aluno_id||'';
   carregarAlunos();
 };
-
 async function carregarAlunos(){
   const tb=$('tbody-alunos');
   const {data,error}=await sb.from('vw_estado_alunos').select('*').order('nome');
@@ -377,7 +372,6 @@ async function carregarAlunos(){
   });
 }
 $('btn-refresh-alunos').onclick=carregarAlunos;
-
 $('btn-pagar').onclick=async()=>{
   const t=$('p-toast');
   toast(t,'A confirmar…','info');
@@ -392,7 +386,6 @@ $('btn-pagar').onclick=async()=>{
   toast(t,'Pago. Vencimento: '+(data&&data.vencimento_novo?data.vencimento_novo:'—'),'ok');
   carregarAlunos();
 };
-
 async function carregarMovimentos(){
   const tb=$('tbody-mov');
   const {data,error}=await sb.rpc('listar_movimentos_recentes',{p_limite:40});
@@ -406,7 +399,6 @@ async function carregarMovimentos(){
   }).join('');
 }
 $('btn-refresh-mov').onclick=carregarMovimentos;
-
 $('btn-def-codigo').onclick=async()=>{
   const t=$('c-toast');
   toast(t,'A definir…','info');
@@ -414,7 +406,6 @@ $('btn-def-codigo').onclick=async()=>{
   if(error){toast(t,error.message||'Já definido ou sem permissão','err');return}
   toast(t,'Código definido no servidor.','ok');
 };
-
 sb.auth.onAuthStateChange((_e,session)=>{if(session)goApp(session);else goLogin()});
 boot();
 </script>
