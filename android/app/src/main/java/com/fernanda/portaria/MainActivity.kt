@@ -445,7 +445,7 @@ fun ContaTab(repo: SupabaseRepo, onLogout: () -> Unit) {
         Spacer(Modifier.height(20.dp))
         Button(onClick = onLogout, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB91C1C)),
             modifier = Modifier.fillMaxWidth().height(48.dp)) { Text("Terminar sessao") }
-        Text("Escola Fernanda · Portaria v1.3", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 24.dp))
+        Text("Escola Fernanda · Portaria v1.4", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 24.dp))
     }
 }
 
@@ -453,5 +453,9 @@ private fun extrairToken(raw: String): String {
     val t = raw.trim()
     if (t.matches(Regex("^[a-fA-F0-9]{32}$"))) return t.lowercase()
     Regex("[a-fA-F0-9]{32}").find(t)?.value?.let { return it.lowercase() }
+    Regex("(?i)passe:\\s*(\\d{1,9})").find(t)?.groupValues?.get(1)?.let { return it }
+    Regex("(?i)(?:codigo|id):\\s*([A-Z]{1,3}-\\d+)").find(t)?.groupValues?.get(1)?.let { return it.uppercase() }
+    if (t.matches(Regex("^[A-Za-z]{1,3}-\\d+$"))) return t.uppercase()
+    if (t.matches(Regex("^\\d{1,9}$"))) return t
     return t
 }
