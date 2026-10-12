@@ -11,10 +11,13 @@ import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.rpc
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.time.Instant
 import java.util.UUID
+import kotlin.time.Duration.Companion.hours
 
 class SupabaseRepo(private val context: Context) {
     private val db = AppDatabase.get(context)
@@ -25,6 +28,7 @@ class SupabaseRepo(private val context: Context) {
         ) {
             install(Auth)
             install(Postgrest)
+            install(Storage)
         }
     }
 
@@ -71,7 +75,8 @@ class SupabaseRepo(private val context: Context) {
                 put("p_offline", false)
                 if (decisaoLocal != null) put("p_decisao_local", decisaoLocal)
             }
-            parseResposta(client.postgrest.rpc("registar_leitura", params).data)
+            val r = parseResposta(client.postgrest.rpc("registar_leitura", params).data)
+            r.copy(fotoPath = resolverFotoUrl(r.fotoPath))
         }.getOrElse {
             db.eventoDao().inserir(
                 EventoPendente(id = eventoId, token = token, tipo = tipo.name, decisaoLocal = decisaoLocal)
@@ -107,6 +112,52 @@ class SupabaseRepo(private val context: Context) {
         return n
     }
 
+    suspend fun listarHistoricoServidor(limite: Int = 50): List<MovimentoItem> {
+        if (!temInternet() || !sessaoAtiva()) return emptyList()
+        return runCatching {
+            val raw = client.postgrest.rpc(
+                "listar_movimentos_recentes",
+                buildJsonObject { put("p_limite", limite) }
+            ).data
+            parseListaMovimentos(raw)
+        }.getOrElse { emptyList() }
+    }
+
+    suspend fun resolverFotoUrl(path: String?): String? {
+        if (path.isNullOrBlank()) return null
+        if (path.startsWith("http://") || path.startsWith("https://")) return path
+        return runCatching {
+            client.storage.from("fotos").createSignedUrl(path, 2.hours)
+        }.getOrNull()
+    }
+
+    private fun parseListaMovimentos(raw: String): List<MovimentoItem> {
+        val items = mutableListOf<MovimentoItem>()
+        val objRegex = Regex("\\{[^{}]*\\}")
+        for (m in objRegex.findAll(raw)) {
+            val o = m.value
+            fun g(k: String) = Regex("\"$k\"\\s*:\\s*\"([^\"]*)\"").find(o)?.groupValues?.get(1)
+            fun gb(k: String) = Regex("\"$k\"\\s*:\\s*(true|false)").find(o)?.groupValues?.get(1) == "true"
+            items.add(
+                MovimentoItem(
+                    id = g("id") ?: "",
+                    tipo = g("tipo") ?: "",
+                    resultado = g("resultado") ?: "",
+                    offline = gb("offline"),
+                    ocorridoEm = g("ocorrido_em") ?: "",
+                    alunoNome = g("aluno_nome"),
+                    alunoTurma = g("aluno_turma"),
+                    alunoCurso = g("aluno_curso"),
+                    alunoCodigo = g("aluno_codigo"),
+                    numeroPasse = g("numero_passe"),
+                    passeEstado = g("passe_estado"),
+                    fotoPath = g("foto_path")
+                )
+            )
+        }
+        return items
+    }
+
     private fun parseResposta(raw: String): RespostaLeitura {
         fun g(k: String): String? =
             Regex("\"$k\"\\s*:\\s*\"([^\"]*)\"").find(raw)?.groupValues?.get(1)
@@ -127,6 +178,7 @@ class SupabaseRepo(private val context: Context) {
             estadoPropina = g("estado_propina"),
             passeEstado = g("passe_estado"),
             vencimento = nested("aluno", "vencimento") ?: g("vencimento"),
+            fotoPath = nested("aluno", "foto_path"),
             offline = raw.contains("\"offline\":true") || raw.contains("\"offline\": true"),
             repetido = res == "duplicado",
             ocorridoEm = g("ocorrido_em")
