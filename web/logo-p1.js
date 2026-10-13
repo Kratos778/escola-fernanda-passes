@@ -1,0 +1,1 @@
+window.__LOGO_P1="PLACEHOLDER";
