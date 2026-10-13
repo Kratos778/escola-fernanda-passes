@@ -6,118 +6,137 @@
 <title>Escola Fernanda · Secretaria</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--verde:#22a884;--escuro:#0e5c4a;--claro:#e8f8f3;--bg:#f0f5f3;--tinta:#1a2a24;--muted:#5d7168;--linha:#d5e4de;--erro:#d32f2f;--ok:#2e7d4f;--card:#fff;--sombra:0 6px 24px rgba(14,92,74,.07)}
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Segoe UI",system-ui,Roboto,sans-serif;background:var(--bg);color:var(--tinta);min-height:100vh}button,input,select{font:inherit}.hidden{display:none!important}
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 30% 20%,#3ecf9a 0%,#0e5c4a 50%,#0a3d32 100%)}
-.login-card{width:100%;max-width:400px;background:#fff;border-radius:22px;padding:34px 28px;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:pop .4s ease}
-@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
-.login-logo{width:68px;height:68px;border-radius:18px;margin:0 auto 16px;background:linear-gradient(135deg,#dff7ee,#b8ead9);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--escuro)}
-.login-card h1{text-align:center;font-size:22px;color:var(--escuro);margin-bottom:4px}.login-card .sub{text-align:center;font-size:14px;color:var(--muted);margin-bottom:22px}
-.field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}
-.field input,.field select{width:100%;padding:12px 14px;border:1.5px solid var(--linha);border-radius:12px;font-size:15px;background:#fafcfb}
-.field input:focus,.field select:focus{outline:none;border-color:var(--verde);box-shadow:0 0 0 3px rgba(34,168,132,.18)}
-.btn-primary{width:100%;margin-top:8px;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,#22a884,#18906f);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
-.btn-primary:disabled{opacity:.55;cursor:not-allowed}
-.login-err{margin-top:12px;padding:10px;border-radius:10px;background:#fdecea;color:var(--erro);font-size:13px;text-align:center}
-.login-hint{margin-top:16px;font-size:12px;color:var(--muted);text-align:center}
+:root{--v:#22a884;--e:#0e5c4a;--c:#e8f8f3;--bg:#f0f5f3;--t:#1a2a24;--m:#5d7168;--l:#d5e4de;--err:#d32f2f;--ok:#2e7d4f}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+button,input,select{font:inherit}.hidden{display:none!important}
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 30% 20%,#3ecf9a,#0e5c4a 55%,#0a3d32)}
+.login-card{width:100%;max-width:400px;background:#fff;border-radius:22px;padding:34px 28px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.login-logo{width:64px;height:64px;border-radius:16px;margin:0 auto 14px;background:linear-gradient(135deg,#dff7ee,#b8ead9);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--e)}
+.login-card h1{text-align:center;font-size:22px;color:var(--e)}.login-card .sub{text-align:center;font-size:13px;color:var(--m);margin:6px 0 20px}
+.field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:700;color:var(--m);margin-bottom:5px}
+.field input,.field select{width:100%;padding:12px 14px;border:1.5px solid var(--l);border-radius:12px;font-size:15px;background:#fafcfb}
+.btn-primary{width:100%;margin-top:8px;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,#22a884,#18906f);color:#fff;font-weight:700;cursor:pointer}.btn-primary:disabled{opacity:.55}
+.login-err{margin-top:12px;padding:10px;border-radius:10px;background:#fdecea;color:var(--err);font-size:13px;text-align:center}.login-hint{margin-top:14px;font-size:12px;color:var(--m);text-align:center}
 #app-screen{min-height:100vh;display:flex;flex-direction:column}
-.topbar{background:linear-gradient(90deg,#0e5c4a,#1a7a62);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.topbar .brand{font-weight:800;font-size:16px}.topbar .user{font-size:12px;opacity:.9;margin-top:2px}
-.topbar .btn-out{background:rgba(255,255,255,.15);border:0;color:#fff;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13px}
-.tabs{background:#fff;border-bottom:1px solid var(--linha);display:flex;gap:4px;padding:8px 12px;overflow-x:auto;position:sticky;top:0;z-index:10}
-.tabs button{border:0;background:transparent;padding:9px 14px;border-radius:999px;font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
-.tabs button.on{background:var(--claro);color:var(--escuro)}
-.main{max-width:1080px;width:100%;margin:0 auto;padding:18px 12px 48px;flex:1}
-.card{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--sombra);margin-bottom:14px;animation:fadeIn .35s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.card h2{font-size:16px;color:var(--escuro);margin-bottom:4px}.card .hint{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.4}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.grid .full{grid-column:1/-1}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:700;font-size:13px;cursor:pointer;background:var(--verde);color:#fff}.btn.sec{background:var(--claro);color:var(--escuro)}
-.toast{margin-top:12px;padding:11px 13px;border-radius:11px;font-size:13px;display:none}.toast.show{display:block}
-.toast.ok{background:#e8f7ef;color:var(--ok)}.toast.err{background:#fdecea;color:var(--erro)}.toast.info{background:#e7f3fb;color:#0b5f8a}
+.topbar{background:linear-gradient(90deg,#0e5c4a,#1a7a62);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.topbar .brand{font-weight:800;font-size:16px}.topbar .user{font-size:12px;opacity:.9}
+.btn-out{background:rgba(255,255,255,.15);border:0;color:#fff;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13px}
+.tabs{background:#fff;border-bottom:1px solid var(--l);display:flex;gap:4px;padding:8px 10px;overflow-x:auto;position:sticky;top:0;z-index:10}
+.tabs button{border:0;background:transparent;padding:9px 13px;border-radius:999px;font-weight:600;font-size:12px;color:var(--m);cursor:pointer;white-space:nowrap}.tabs button.on{background:var(--c);color:var(--e)}
+.main{max-width:1080px;width:100%;margin:0 auto;padding:16px 12px 48px;flex:1}
+.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 6px 24px rgba(14,92,74,.07);margin-bottom:14px}
+.card h2{font-size:16px;color:var(--e);margin-bottom:4px}.card .hint{font-size:13px;color:var(--m);margin-bottom:12px;line-height:1.4}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.grid .full{grid-column:1/-1}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{border:0;border-radius:11px;padding:11px 15px;font-weight:700;font-size:13px;cursor:pointer;background:var(--v);color:#fff}.btn.sec{background:var(--c);color:var(--e)}
+.toast{margin-top:12px;padding:11px;border-radius:11px;font-size:13px;display:none}.toast.show{display:block}.toast.ok{background:#e8f7ef;color:var(--ok)}.toast.err{background:#fdecea;color:var(--err)}.toast.info{background:#e7f3fb;color:#0b5f8a}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px}
-.stat{background:#fff;border-radius:14px;padding:14px;box-shadow:var(--sombra)}.stat .n{font-size:24px;font-weight:800;color:var(--escuro)}.stat .l{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
-.filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:flex-end}.filtros .field{margin:0;min-width:140px;flex:1}
-.grupo{margin-bottom:18px}.grupo-titulo{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-radius:12px;background:linear-gradient(90deg,#e8f8f3,#f5fbf8);border:1px solid #cfe9df;margin-bottom:10px}
-.grupo-titulo h3{font-size:14px;color:var(--escuro);font-weight:800}.grupo-titulo .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#fff;color:var(--muted);border:1px solid var(--linha)}
-.aluno-list{display:flex;flex-direction:column;gap:8px}
-.aluno-item{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-.aluno-item .nome{font-weight:800;font-size:14px;color:var(--escuro)}.aluno-item .meta{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
-.aluno-item .meta code{background:var(--claro);color:var(--escuro);padding:2px 6px;border-radius:6px;font-size:11px;font-weight:700}
-.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:800}
-.badge.ok{background:#e8f7ef;color:var(--ok)}.badge.warn{background:#fff6dd;color:#9a6700}.badge.bad{background:#fdecea;color:var(--erro)}
-.row-actions{display:flex;flex-direction:column;gap:5px}.row-actions button{padding:7px 11px;font-size:11px;border-radius:8px;border:0;background:var(--claro);color:var(--escuro);cursor:pointer;font-weight:700}
-.result-box{margin-top:12px;padding:14px;background:linear-gradient(135deg,#e8f8f3,#f7fcfa);border-radius:12px;font-size:13px;line-height:1.5;display:none;border:1px solid #cfe9df}.result-box.show{display:block}.result-box .big-id{font-size:17px;font-weight:800;color:var(--escuro);margin:4px 0}.note{font-size:12px;color:var(--muted);margin-top:6px}
+.stat{background:#fff;border-radius:14px;padding:14px;box-shadow:0 6px 20px rgba(14,92,74,.06)}.stat .n{font-size:26px;font-weight:800;color:var(--e)}.stat .l{font-size:11px;color:var(--m);margin-top:4px;font-weight:600}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:flex-end}.filtros .field{margin:0;min-width:130px;flex:1}
+.grupo{margin-bottom:16px}.grupo-titulo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;border-radius:12px;background:linear-gradient(90deg,#e8f8f3,#f5fbf8);border:1px solid #cfe9df;margin-bottom:8px}
+.grupo-titulo h3{font-size:14px;color:var(--e)}.chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#fff;color:var(--m);border:1px solid var(--l)}
+.aluno-item{background:#fff;border:1px solid var(--l);border-radius:12px;padding:12px;display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:8px}
+.aluno-item .nome{font-weight:800;font-size:14px;color:var(--e)}.aluno-item .meta{font-size:12px;color:var(--m);margin-top:3px;line-height:1.4}
+.aluno-item code{background:var(--c);color:var(--e);padding:2px 6px;border-radius:6px;font-size:11px;font-weight:700}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:800}.badge.ok{background:#e8f7ef;color:var(--ok)}.badge.warn{background:#fff6dd;color:#9a6700}.badge.bad{background:#fdecea;color:var(--err)}
+.row-actions{display:flex;flex-direction:column;gap:5px}.row-actions button{padding:7px 10px;font-size:11px;border-radius:8px;border:0;background:var(--c);color:var(--e);cursor:pointer;font-weight:700}
+.passe-wrap{margin-top:14px;display:none}.passe-wrap.show{display:block}
+.passe-card{width:100%;max-width:420px;margin:0 auto;border:2px solid var(--e);border-radius:16px;padding:18px;background:linear-gradient(160deg,#fff 60%,#e8f8f3)}
+.passe-card .escola{font-size:12px;font-weight:800;color:var(--e);text-transform:uppercase}.passe-card .titulo{font-size:18px;font-weight:800;color:var(--e);margin:6px 0 12px}
+.passe-card .linha{font-size:13px;margin:4px 0}.passe-card .id-big{font-size:22px;font-weight:800;letter-spacing:1px;color:var(--e);margin:12px 0;padding:10px;background:var(--c);border-radius:10px;text-align:center}
+.passe-card .num{font-size:14px;text-align:center;color:var(--m)}
+@media print{body *{visibility:hidden}.passe-wrap,.passe-wrap *{visibility:visible}.passe-wrap{position:absolute;left:0;top:0;width:100%}.no-print{display:none!important}}
 @media(max-width:640px){.aluno-item{grid-template-columns:1fr}.row-actions{flex-direction:row;flex-wrap:wrap}}
 </style>
 </head>
 <body>
-<div id="login-screen"><div class="login-card"><div class="login-logo">EF</div><h1>Escola Fernanda</h1><p class="sub">Secretaria · alunos, passes e propinas</p>
-<div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username" placeholder="seu@email.com"></div>
-<div class="field"><label for="password">Palavra-passe</label><input id="password" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+<div id="login-screen"><div class="login-card"><div class="login-logo">EF</div><h1>Escola Fernanda</h1><p class="sub">Secretaria</p>
+<div class="field"><label>Email</label><input id="email" type="email" autocomplete="username"></div>
+<div class="field"><label>Palavra-passe</label><input id="password" type="password" autocomplete="current-password"></div>
 <button class="btn-primary" id="btn-login" type="button">Entrar</button>
-<div class="login-err hidden" id="login-err"></div><p class="login-hint">Mesma conta do app da portaria</p></div></div>
+<div class="login-err hidden" id="login-err"></div><p class="login-hint">Conta Supabase Auth</p></div></div>
 <div id="app-screen" class="hidden">
-<header class="topbar"><div><div class="brand">Escola Fernanda · Secretaria</div><div class="user" id="user-label"></div></div>
+<header class="topbar no-print"><div><div class="brand">Escola Fernanda</div><div class="user" id="user-label"></div></div>
 <button class="btn-out" id="btn-logout" type="button">Sair</button></header>
-<nav class="tabs">
-<button type="button" class="on" data-tab="alunos">Alunos & Passes</button>
+<nav class="tabs no-print">
+<button type="button" class="on" data-tab="inicio">Início</button>
+<button type="button" data-tab="criar">Criar passe</button>
+<button type="button" data-tab="lista">Lista alunos</button>
 <button type="button" data-tab="propinas">Propinas</button>
 <button type="button" data-tab="movimentos">Movimentos</button>
 <button type="button" data-tab="admin">Admin</button></nav>
 <div class="main">
-<section id="tab-alunos">
-<div class="stats"><div class="stat"><div class="n" id="st-total">—</div><div class="l">Alunos</div></div>
+<section id="tab-inicio">
+<div class="stats"><div class="stat"><div class="n" id="st-total">—</div><div class="l">Alunos activos</div></div>
 <div class="stat"><div class="n" id="st-emdia">—</div><div class="l">Propina em dia</div></div>
-<div class="stat"><div class="n" id="st-atraso">—</div><div class="l">Em atraso / sem pago</div></div></div>
-<div class="card"><h2>Novo aluno e passe</h2>
-<p class="hint">Curso, turma e ano são <strong>livres</strong> — escreves o que a escola usa (qualquer curso, não só Informática). O nº de identificação vai no QR.</p>
+<div class="stat"><div class="n" id="st-atraso">—</div><div class="l">Atraso / sem pago</div></div></div>
+<div class="card"><h2>Resumo</h2>
+<p class="hint">Números gerais. Registo e impressão do passe em <strong>Criar passe</strong>. Lista por curso em <strong>Lista alunos</strong>.</p>
+<div class="actions"><button class="btn" type="button" id="go-criar">Criar passe</button>
+<button class="btn sec" type="button" id="go-lista">Ver lista</button></div></div>
+</section>
+<section id="tab-criar" class="hidden">
+<div class="card"><h2>Registar aluno e emitir passe</h2>
+<p class="hint">Campos manuais: qualquer curso (Iniciação até 12.ª/13.ª, Informática, Economia…). Depois <strong>Imprimir / guardar PDF</strong>.</p>
 <div class="grid">
 <div class="field full"><label>Código de administração</label><input type="password" id="a-admin"></div>
-<div class="field full"><label>Nome completo</label><input id="a-nome" placeholder="Ex: Ana Beatriz Fernandes"></div>
+<div class="field full"><label>Nome completo</label><input id="a-nome"></div>
 <div class="field"><label>Nº identificação (QR)</label><input id="a-codigo-id" placeholder="ED-0123456"></div>
-<div class="field"><label>Curso (manual)</label><input id="a-curso" placeholder="Ex: Economia, Mecânica…" list="lista-cursos"></div>
-<div class="field"><label>Turma (manual)</label><input id="a-turma" placeholder="Ex: 9ª B, 12ª C…" list="lista-turmas"></div>
-<div class="field"><label>Ano letivo / período (manual)</label><input id="a-ano" placeholder="Ex: 2025/2026, 2026/2027…" list="lista-anos"></div>
+<div class="field"><label>Curso</label><input id="a-curso" list="lista-cursos" placeholder="Informática, Economia, Geral…"></div>
+<div class="field"><label>Classe / turma</label><input id="a-turma" list="lista-turmas" placeholder="Iniciação, 7ª A, 12ª B…"></div>
+<div class="field"><label>Turno</label><select id="a-turno"><option value="">—</option><option>Manhã</option><option>Tarde</option><option>Noite</option></select></div>
+<div class="field"><label>Ano letivo</label><input id="a-ano" list="lista-anos" placeholder="2026/2027"></div>
 </div>
 <datalist id="lista-cursos"></datalist><datalist id="lista-turmas"></datalist><datalist id="lista-anos"></datalist>
-<div class="actions"><button class="btn sec" type="button" id="btn-gen-id">Gerar ID pelo nome</button>
-<button class="btn" type="button" id="btn-criar">Criar aluno e passe</button></div>
-<div class="toast" id="a-toast"></div><div class="result-box" id="a-result"></div></div>
+<div class="actions"><button class="btn sec" type="button" id="btn-gen-id">Gerar ID</button>
+<button class="btn" type="button" id="btn-criar">Criar e ver passe</button></div>
+<div class="toast" id="a-toast"></div></div>
+<div class="passe-wrap" id="passe-wrap">
+<div class="passe-card" id="passe-card">
+<div class="escola">Colégio Fernanda</div><div class="titulo">Passe de aluno</div>
+<div class="linha" id="pc-nome"></div><div class="linha" id="pc-curso"></div>
+<div class="linha" id="pc-turma"></div><div class="linha" id="pc-ano"></div>
+<div class="id-big" id="pc-id"></div><div class="num" id="pc-num"></div>
+</div>
+<div class="actions no-print" style="justify-content:center;margin-top:12px">
+<button class="btn" type="button" id="btn-print">Imprimir / guardar PDF</button></div>
+</div>
+</section>
+<section id="tab-lista" class="hidden">
 <div class="card"><h2>Lista por curso · turma · ano</h2>
-<p class="hint">Filtros e grupos usam o que tu escreveste em cada aluno.</p>
+<p class="hint">Desactivar bloqueia o passe (histórico fica). Precisa da função SQL definir_aluno_ativo.</p>
 <div class="filtros">
 <div class="field"><label>Curso</label><select id="f-curso"><option value="">Todos</option></select></div>
 <div class="field"><label>Turma</label><select id="f-turma"><option value="">Todas</option></select></div>
-<div class="field"><label>Ano / período</label><select id="f-ano"><option value="">Todos</option></select></div>
+<div class="field"><label>Ano</label><select id="f-ano"><option value="">Todos</option></select></div>
 <button class="btn sec" type="button" id="btn-refresh-alunos" style="align-self:flex-end">Atualizar</button>
 </div>
 <div id="lista-alunos"><p class="hint">A carregar…</p></div></div>
 </section>
 <section id="tab-propinas" class="hidden">
-<div class="card"><h2>Confirmar pagamento</h2>
-<p class="hint">1 período de propina = 30 dias.</p>
+<div class="card"><h2>Pagamento de propina</h2>
+<p class="hint">1 período = 30 dias.</p>
 <div class="grid">
-<div class="field full"><label>ID interno (uuid)</label><input id="p-aluno"></div>
+<div class="field full"><label>ID interno</label><input id="p-aluno"></div>
 <div class="field"><label>Valor (AOA)</label><input id="p-valor" type="number" min="0" step="1" placeholder="15000"></div>
-<div class="field"><label>Nº recibo</label><input id="p-recibo" placeholder="REC-2026-001"></div>
-<div class="field"><label>Períodos (meses)</label><input id="p-periodos" type="number" min="1" max="12" value="1"></div>
+<div class="field"><label>Recibo</label><input id="p-recibo"></div>
+<div class="field"><label>Períodos</label><input id="p-periodos" type="number" min="1" max="12" value="1"></div>
 </div>
-<div class="actions"><button class="btn" type="button" id="btn-pagar">Confirmar pagamento</button></div>
+<div class="actions"><button class="btn" type="button" id="btn-pagar">Confirmar</button></div>
 <div class="toast" id="p-toast"></div></div>
 </section>
 <section id="tab-movimentos" class="hidden">
-<div class="card"><h2>Últimas passagens</h2>
+<div class="card"><h2>Passagens</h2>
 <div class="actions"><button class="btn sec" type="button" id="btn-refresh-mov">Atualizar</button></div>
 <div id="lista-mov" style="margin-top:12px;overflow:auto"></div></div>
 </section>
 <section id="tab-admin" class="hidden">
 <div class="card"><h2>Código de administração</h2>
-<p class="hint">Define-se uma vez no servidor.</p>
 <div class="field"><label>Novo código (mín. 8)</label><input type="password" id="c-codigo"></div>
-<div class="actions"><button class="btn" type="button" id="btn-def-codigo">Definir no servidor</button></div>
+<div class="actions"><button class="btn" type="button" id="btn-def-codigo">Definir</button></div>
 <div class="toast" id="c-toast"></div></div>
+<div class="card"><h2>Função desactivar aluno</h2>
+<p class="hint">Se Desactivar falhar, no SQL Editor corre o Raw de <strong>supabase/patch-admin-dados.sql</strong> no GitHub.</p></div>
 </section>
 </div></div>
 <script>
@@ -129,19 +148,22 @@ function cyrb53(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i+
 function idDoNome(nome){const p=semAcentos(nome).toUpperCase().replace(/[^A-Z ]/g,' ').split(/\s+/).filter(Boolean);if(!p.length)return '';const ini=p[0].charAt(0)+(p.length>1?p[p.length-1].charAt(0):(p[0].charAt(1)||'X'));let d=String(cyrb53(p.join(' '))%10000000);while(d.length<7)d='0'+d;return ini+'-'+d}
 function pad9(n){return String(n==null?'':n).replace(/\D/g,'').padStart(9,'0').slice(-9)}
 function propBadge(prop){if(prop==='em_dia')return '<span class="badge ok">Em dia</span>';if(prop==='vencida')return '<span class="badge bad">Vencida</span>';if(prop==='sem_pagamento')return '<span class="badge warn">Sem pagamento</span>';return '<span class="badge warn">'+(prop||'—')+'</span>'}
+function showTab(name){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));['inicio','criar','lista','propinas','movimentos','admin'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==name));if(name==='lista'||name==='inicio')carregarAlunos();if(name==='movimentos')carregarMovimentos()}
 async function goApp(session){$('login-screen').classList.add('hidden');$('app-screen').classList.remove('hidden');$('user-label').textContent=session.user.email||session.user.id;await carregarAlunos()}
 function goLogin(){$('app-screen').classList.add('hidden');$('login-screen').classList.remove('hidden')}
 async function boot(){const {data:{session}}=await sb.auth.getSession();if(session)await goApp(session);else goLogin()}
 $('btn-login').onclick=async()=>{const err=$('login-err');err.classList.add('hidden');const email=$('email').value.trim(),password=$('password').value;if(!email||!password){err.textContent='Preenche email e palavra-passe.';err.classList.remove('hidden');return}$('btn-login').disabled=true;$('btn-login').textContent='A entrar…';const {data,error}=await sb.auth.signInWithPassword({email,password});$('btn-login').disabled=false;$('btn-login').textContent='Entrar';if(error){err.textContent='Credenciais incorrectas.';err.classList.remove('hidden');return}await goApp(data.session)};
 $('btn-logout').onclick=async()=>{await sb.auth.signOut();goLogin()};
-document.querySelectorAll('.tabs button').forEach(btn=>{btn.onclick=()=>{document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['alunos','propinas','movimentos','admin'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==btn.dataset.tab));if(btn.dataset.tab==='movimentos')carregarMovimentos();if(btn.dataset.tab==='alunos')carregarAlunos()}});
-$('btn-gen-id').onclick=()=>{$('a-codigo-id').value=idDoNome($('a-nome').value)};
-$('btn-criar').onclick=async()=>{const t=$('a-toast'),box=$('a-result');box.classList.remove('show');toast(t,'A criar…','info');const {data,error}=await sb.rpc('criar_aluno_e_passe',{p_codigo_admin:$('a-admin').value,p_nome:$('a-nome').value.trim(),p_codigo_id:$('a-codigo-id').value.trim(),p_turma:$('a-turma').value.trim()||null,p_ano_letivo:$('a-ano').value.trim()||null,p_curso:$('a-curso').value.trim()||null});if(error){const msg=error.message||'Erro';if(/já existe|identifica/i.test(msg))toast(t,'Este ID já existe. Atualiza a lista.','err');else toast(t,msg,'err');return}if(data&&data.ok===false){toast(t,data.erro||'Falhou','err');return}toast(t,'Aluno e passe criados.','ok');const num=pad9(data.numero),cid=$('a-codigo-id').value.trim();box.innerHTML='<div class="big-id">QR / ID: '+cid+'</div><div><strong>Nº passe:</strong> '+num+'</div><div class="note">Ano: '+($('a-ano').value.trim()||'—')+' · Curso: '+($('a-curso').value.trim()||'—')+' · Turma: '+($('a-turma').value.trim()||'—')+'</div>';box.classList.add('show');$('p-aluno').value=data.aluno_id||'';carregarAlunos()};
+document.querySelectorAll('.tabs button').forEach(btn=>{btn.onclick=()=>showTab(btn.dataset.tab)});$('go-criar').onclick=()=>showTab('criar');$('go-lista').onclick=()=>showTab('lista');
+$('btn-gen-id').onclick=()=>$('a-codigo-id').value=idDoNome($('a-nome').value);
+function turmaCompleta(){const t=$('a-turma').value.trim(),turno=$('a-turno').value;if(!t)return turno||null;if(!turno)return t;return t+' · '+turno}
+$('btn-criar').onclick=async()=>{const t=$('a-toast');$('passe-wrap').classList.remove('show');toast(t,'A criar…','info');const turma=turmaCompleta();const {data,error}=await sb.rpc('criar_aluno_e_passe',{p_codigo_admin:$('a-admin').value,p_nome:$('a-nome').value.trim(),p_codigo_id:$('a-codigo-id').value.trim(),p_turma:turma,p_ano_letivo:$('a-ano').value.trim()||null,p_curso:$('a-curso').value.trim()||null});if(error){toast(t,/já existe|identifica/i.test(error.message||'')?'Este ID já existe.':(error.message||'Erro'),'err');return}if(data&&data.ok===false){toast(t,data.erro||'Falhou','err');return}toast(t,'Criado. Imprime o passe abaixo.','ok');const cid=$('a-codigo-id').value.trim(),num=pad9(data.numero);$('pc-nome').innerHTML='<strong>Nome:</strong> '+$('a-nome').value.trim();$('pc-curso').innerHTML='<strong>Curso:</strong> '+($('a-curso').value.trim()||'—');$('pc-turma').innerHTML='<strong>Turma / turno:</strong> '+(turma||'—');$('pc-ano').innerHTML='<strong>Ano letivo:</strong> '+($('a-ano').value.trim()||'—');$('pc-id').textContent=cid;$('pc-num').textContent='Nº passe (barras): '+num;$('passe-wrap').classList.add('show');$('p-aluno').value=data.aluno_id||'';carregarAlunos()};
+$('btn-print').onclick=()=>window.print();
 function preencherFiltros(data){const cursos=[...new Set(data.map(a=>a.curso).filter(Boolean))].sort();const turmas=[...new Set(data.map(a=>a.turma).filter(Boolean))].sort();const anos=[...new Set(data.map(a=>a.ano_letivo).filter(Boolean))].sort();const fill=(sel,arr,all)=>{const cur=sel.value;sel.innerHTML='<option value="">'+all+'</option>'+arr.map(v=>'<option value="'+v+'">'+v+'</option>').join('');if(arr.includes(cur))sel.value=cur};fill($('f-curso'),cursos,'Todos');fill($('f-turma'),turmas,'Todas');fill($('f-ano'),anos,'Todos');$('lista-cursos').innerHTML=cursos.map(c=>'<option value="'+c+'">').join('');$('lista-turmas').innerHTML=turmas.map(c=>'<option value="'+c+'">').join('');$('lista-anos').innerHTML=anos.map(c=>'<option value="'+c+'">').join('')}
-function renderLista(){const box=$('lista-alunos');let data=alunosCache.slice();const fc=$('f-curso').value,ft=$('f-turma').value,fa=$('f-ano').value;if(fc)data=data.filter(a=>a.curso===fc);if(ft)data=data.filter(a=>a.turma===ft);if(fa)data=data.filter(a=>a.ano_letivo===fa);if(!data.length){box.innerHTML='<p class="hint">Nenhum aluno com estes filtros.</p>';return}const grupos={};data.forEach(a=>{const curso=a.curso||'Sem curso',ano=a.ano_letivo||'Sem ano/período',turma=a.turma||'Sem turma',key=curso+'||'+ano+'||'+turma;if(!grupos[key])grupos[key]={curso,ano,turma,alunos:[]};grupos[key].alunos.push(a)});box.innerHTML=Object.keys(grupos).sort().map(k=>{const g=grupos[k];const cards=g.alunos.map(a=>{const passe=a.passe_numero!=null?pad9(a.passe_numero)+' · '+(a.passe_estado||''):'sem passe';return '<div class="aluno-item"'+(a.ativo===false?' style="opacity:.65"':'')+'><div><div class="nome">'+(a.nome||'')+(a.ativo===false?' <span class="badge bad">Inactivo</span>':'')+'</div><div class="meta">ID: <code>'+(a.codigo_id||'—')+'</code></div><div class="meta">'+propBadge(a.estado_propina)+(a.vencimento?' · venc. '+a.vencimento:'')+' · Passe: '+passe+'</div></div><div class="row-actions"><button type="button" data-pay="'+(a.aluno_id||'')+'">Pagar propina</button>'+(a.ativo===false?'<button type="button" data-react="'+(a.aluno_id||'')+'">Reactivar</button>':'<button type="button" data-off="'+(a.aluno_id||'')+'" style="background:#fdecea;color:#c62828">Desactivar</button>')+'</div></div>'}).join('');return '<div class="grupo"><div class="grupo-titulo"><h3>'+g.curso+'</h3><span class="chip">'+g.turma+'</span><span class="chip">'+g.ano+'</span><span class="chip">'+g.alunos.length+'</span></div><div class="aluno-list">'+cards+'</div></div>'}).join('');box.querySelectorAll('[data-pay]').forEach(b=>{b.onclick=()=>{$('p-aluno').value=b.getAttribute('data-pay');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));document.querySelector('.tabs button[data-tab="propinas"]').classList.add('on');['alunos','propinas','movimentos','admin'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!=='propinas'))}});box.querySelectorAll('[data-off]').forEach(b=>{b.onclick=()=>desactivarAluno(b.getAttribute('data-off'),false)});box.querySelectorAll('[data-react]').forEach(b=>{b.onclick=()=>desactivarAluno(b.getAttribute('data-react'),true)})}
-async function carregarAlunos(){const box=$('lista-alunos');const {data,error}=await sb.from('vw_estado_alunos').select('*').order('nome');if(error){box.innerHTML='<p class="toast show err" style="display:block">'+(error.message||'Erro')+'</p>';return}alunosCache=data||[];if(!alunosCache.length){box.innerHTML='<p class="hint">Ainda não há alunos.</p>';$('st-total').textContent='0';$('st-emdia').textContent='0';$('st-atraso').textContent='0';return}let em=0,at=0;alunosCache.forEach(a=>{if(a.estado_propina==='em_dia')em++;else at++});$('st-total').textContent=String(alunosCache.length);$('st-emdia').textContent=String(em);$('st-atraso').textContent=String(at);preencherFiltros(alunosCache);renderLista()}
+function renderLista(){const box=$('lista-alunos');let data=alunosCache.slice();const fc=$('f-curso').value,ft=$('f-turma').value,fa=$('f-ano').value;if(fc)data=data.filter(a=>a.curso===fc);if(ft)data=data.filter(a=>a.turma===ft);if(fa)data=data.filter(a=>a.ano_letivo===fa);if(!data.length){box.innerHTML='<p class="hint">Nenhum aluno.</p>';return}const grupos={};data.forEach(a=>{const curso=a.curso||'Sem curso',ano=a.ano_letivo||'Sem ano',turma=a.turma||'Sem turma',key=curso+'||'+ano+'||'+turma;if(!grupos[key])grupos[key]={curso,ano,turma,alunos:[]};grupos[key].alunos.push(a)});box.innerHTML=Object.keys(grupos).sort().map(k=>{const g=grupos[k];const cards=g.alunos.map(a=>{const passe=a.passe_numero!=null?pad9(a.passe_numero):'—';return '<div class="aluno-item"'+(a.ativo===false?' style="opacity:.65"':'')+'><div><div class="nome">'+(a.nome||'')+(a.ativo===false?' <span class="badge bad">Inactivo</span>':'')+'</div><div class="meta">ID: <code>'+(a.codigo_id||'—')+'</code> · Passe '+passe+'</div><div class="meta">'+propBadge(a.estado_propina)+(a.vencimento?' · venc. '+a.vencimento:'')+'</div></div><div class="row-actions"><button type="button" data-pay="'+(a.aluno_id||'')+'">Pagar</button>'+(a.ativo===false?'<button type="button" data-react="'+(a.aluno_id||'')+'">Reactivar</button>':'<button type="button" data-off="'+(a.aluno_id||'')+'" style="background:#fdecea;color:#c62828">Desactivar</button>')+'</div></div>'}).join('');return '<div class="grupo"><div class="grupo-titulo"><h3>'+g.curso+'</h3><span class="chip">'+g.turma+'</span><span class="chip">'+g.ano+'</span><span class="chip">'+g.alunos.length+'</span></div>'+cards+'</div>'}).join('');box.querySelectorAll('[data-pay]').forEach(b=>{b.onclick=()=>{$('p-aluno').value=b.getAttribute('data-pay');showTab('propinas')}});box.querySelectorAll('[data-off]').forEach(b=>{b.onclick=()=>desactivarAluno(b.getAttribute('data-off'),false)});box.querySelectorAll('[data-react]').forEach(b=>{b.onclick=()=>desactivarAluno(b.getAttribute('data-react'),true)})}
+async function carregarAlunos(){const {data,error}=await sb.from('vw_estado_alunos').select('*').order('nome');if(error){$('lista-alunos').innerHTML='<p class="toast show err" style="display:block">'+(error.message||'Erro')+'</p>';$('st-total').textContent='?';return}alunosCache=data||[];let em=0,at=0,act=0;alunosCache.forEach(a=>{if(a.ativo!==false)act++;if(a.estado_propina==='em_dia')em++;else at++});$('st-total').textContent=String(act);$('st-emdia').textContent=String(em);$('st-atraso').textContent=String(at);if(!alunosCache.length){$('lista-alunos').innerHTML='<p class="hint">Ainda não há alunos.</p>';return}preencherFiltros(alunosCache);renderLista()}
 $('btn-refresh-alunos').onclick=carregarAlunos;$('f-curso').onchange=renderLista;$('f-turma').onchange=renderLista;$('f-ano').onchange=renderLista;
-async function desactivarAluno(alunoId,ativo){const codigo=prompt(ativo?'Código admin para REACTIVAR:':'Código admin para DESACTIVAR:');if(codigo==null)return;if(!codigo.trim()){alert('Código obrigatório.');return}if(!ativo&&!confirm('Desactivar? O passe fica bloqueado.'))return;const {data,error}=await sb.rpc('definir_aluno_ativo',{p_codigo_admin:codigo,p_aluno_id:alunoId,p_ativo:ativo,p_motivo:ativo?null:'Desactivado pela secretaria'});if(error){alert(error.message||'Erro');return}if(data&&data.ok===false){alert(data.erro||'Falhou');return}alert(ativo?'Reactivado.':'Desactivado.');carregarAlunos()}
+async function desactivarAluno(alunoId,ativo){const codigo=prompt(ativo?'Código admin (reactivar):':'Código admin (desactivar):');if(codigo==null)return;if(!codigo.trim()){alert('Código obrigatório.');return}if(!ativo&&!confirm('Desactivar e bloquear passe?'))return;const {data,error}=await sb.rpc('definir_aluno_ativo',{p_codigo_admin:codigo,p_aluno_id:alunoId,p_ativo:ativo,p_motivo:ativo?null:'Desactivado pela secretaria'});if(error){alert((error.message||'Erro')+'\n\nCorre no SQL o Raw de supabase/patch-admin-dados.sql');return}if(data&&data.ok===false){alert(data.erro||'Falhou');return}alert(ativo?'Reactivado.':'Desactivado.');carregarAlunos()}
 $('btn-pagar').onclick=async()=>{const t=$('p-toast');toast(t,'A confirmar…','info');const {data,error}=await sb.rpc('confirmar_pagamento',{p_aluno_id:$('p-aluno').value.trim(),p_ref_transacao:crypto.randomUUID(),p_valor:Number($('p-valor').value),p_recibo:$('p-recibo').value.trim(),p_periodos:Number($('p-periodos').value)||1});if(error){toast(t,error.message||'Erro','err');return}toast(t,'Pago. Vencimento: '+(data&&data.vencimento_novo?data.vencimento_novo:'—'),'ok');carregarAlunos()};
 async function carregarMovimentos(){const box=$('lista-mov');const {data,error}=await sb.rpc('listar_movimentos_recentes',{p_limite:40});if(error){box.innerHTML='<p class="toast show err" style="display:block">'+(error.message||'Erro')+'</p>';return}const rows=Array.isArray(data)?data:[];if(!rows.length){box.innerHTML='<p class="hint">Sem movimentos.</p>';return}box.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid #d5e4de">Quando</th><th style="text-align:left;padding:8px;border-bottom:1px solid #d5e4de">Tipo</th><th style="text-align:left;padding:8px;border-bottom:1px solid #d5e4de">Resultado</th><th style="text-align:left;padding:8px;border-bottom:1px solid #d5e4de">Aluno</th></tr></thead><tbody>'+rows.map(m=>{const q=String(m.ocorrido_em||'').replace('T',' ').slice(0,19);return '<tr><td style="padding:8px;border-bottom:1px solid #eef2f0">'+q+'</td><td style="padding:8px;border-bottom:1px solid #eef2f0">'+(m.tipo||'')+'</td><td style="padding:8px;border-bottom:1px solid #eef2f0">'+(m.resultado||'')+'</td><td style="padding:8px;border-bottom:1px solid #eef2f0">'+(m.aluno_nome||'—')+'</td></tr>'}).join('')+'</tbody></table>'}
 $('btn-refresh-mov').onclick=carregarMovimentos;
