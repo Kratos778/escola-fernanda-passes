@@ -20,7 +20,7 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
 .grelha input:focus{outline:none;border-color:var(--verde)}
 .grelha input[readonly]{background:#f0f4f2;color:var(--escuro);font-weight:700}
 .acoes{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-.btn{display:inline-block;background:var(--verde);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn{display:inline-block;background:var(--verde);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
 .btn.sec{background:var(--claro);color:var(--escuro)}
 .dica{font-size:11.5px;color:#6a786f;margin-top:10px;line-height:1.4}
 .cartoes{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
@@ -28,7 +28,7 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
 .onda{position:absolute;left:0;bottom:0;width:100%;height:100%;pointer-events:none}
 .onda .c1{fill:#d6ebe5}.onda .c2{fill:var(--verde)}
 .card>*:not(.onda){position:absolute}
-.logo{left:16px;top:12px;width:100px;height:100px;border-radius:12px;object-fit:contain;background:transparent}
+.logo{left:16px;top:12px;width:100px;height:100px;border-radius:12px;object-fit:contain;background:transparent;image-rendering:auto}
 .titulo{left:122px;top:30px;font-weight:800;font-size:25px;line-height:1.08;color:var(--escuro)}
 .foto{right:22px;top:30px;width:126px;height:168px;border-radius:10px;border:2px dashed var(--verde);background:var(--claro) center/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:var(--escuro);cursor:pointer;line-height:1.3}
 .foto.ok{border-style:solid}
@@ -41,8 +41,8 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
 .esq{left:24px;top:22px;width:300px}
 .esq .l{font-size:11px;font-weight:600;color:var(--escuro)}
 .passe{font-size:31px;font-weight:800;letter-spacing:2.5px;line-height:1.1}
-.bar{margin-top:8px;width:250px;height:40px;background:#fff}.bar svg{width:100%;height:100%;display:block}
-.idbar{width:250px;text-align:center;font-size:11px;font-weight:700;letter-spacing:2px;margin-top:2px;min-height:14px}
+.bar{margin-top:8px;width:280px;height:44px;background:#fff}.bar svg{width:100%;height:100%;display:block}
+.idbar{width:280px;text-align:center;font-size:12px;font-weight:700;letter-spacing:1.5px;margin-top:2px;min-height:14px}
 .esq h2{font-size:13px;color:var(--escuro);margin:10px 0 4px;font-weight:800}
 .esq p{font-size:11.5px;line-height:1.4}
 .contacto{margin-top:8px;font-size:12px;font-weight:700;line-height:1.35}
@@ -57,8 +57,8 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
   <h1>Dados do aluno (cartão oficial)</h1>
   <div class="grelha">
     <label class="full">Nome completo<input type="text" id="nome" autocomplete="off"></label>
-    <label>Nº de identificação (QR)<input type="text" id="idn" readonly></label>
-    <label>Nº do passe (barras)<input type="text" id="passe" inputmode="numeric" maxlength="9"></label>
+    <label>Nº de identificação (código de barras)<input type="text" id="idn" readonly></label>
+    <label>Nº do passe<input type="text" id="passe" inputmode="numeric" maxlength="9"></label>
     <label>Turma<input type="text" id="turma"></label>
     <label>Ano letivo<input type="text" id="ano"></label>
     <label>Curso<input type="text" id="curso"></label>
@@ -68,9 +68,9 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
   <div class="acoes">
     <label class="btn" for="fin">Escolher foto</label>
     <button class="btn sec" type="button" onclick="window.print()">Imprimir / PDF</button>
-    <a class="btn sec" href="index.html" style="text-decoration:none;display:inline-block">← Voltar ao painel</a>
+    <a class="btn sec" href="index.html">← Voltar ao painel</a>
   </div>
-  <p class="dica">O nº do passe vem do servidor ao criar o aluno. Podes alterar aqui só para a impressão. Foto: usa Chrome.</p>
+  <p class="dica">Código de barras = ID (ex: ED-3761770). QR = nome, turma, ano, curso, nº passe (sem o ID).</p>
   <input type="file" accept="image/*" id="fin" style="position:absolute;width:1px;height:1px;opacity:0">
 </div>
 <div class="cartoes">
@@ -97,7 +97,7 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
       <div class="bar"><svg id="bar"></svg></div>
       <div class="idbar" id="bar-txt"></div>
       <h2>Instruções</h2>
-      <p>Apresente este cartão na portaria. O QR identifica o aluno no sistema.</p>
+      <p>Apresente este cartão na portaria. O código de barras é o ID do aluno; o QR tem os restantes dados.</p>
       <div class="contacto"><span id="o-end"></span><br><span id="o-cont"></span></div>
     </div>
     <div class="qrbox" id="qr"></div>
@@ -111,14 +111,63 @@ function semAcentos(t){return t.normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function cyrb53(str){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0;i<str.length;i++){var ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0)}
 function idDoNome(nome){var p=semAcentos(nome).toUpperCase().replace(/[^A-Z ]/g,' ').split(/\s+/).filter(Boolean);if(!p.length)return '';var ini=p[0].charAt(0)+(p.length>1?p[p.length-1].charAt(0):(p[0].charAt(1)||'X'));var d=String(cyrb53(p.join(' '))%10000000);while(d.length<7)d='0'+d;return ini+'-'+d}
 function pad9(v){v=String(v||'').replace(/\D/g,'').slice(0,9);return ('000000000'+v).slice(-9)}
-function desenhaQR(texto){var el=$('qr');el.innerHTML='';if(!texto)return;new QRCode(el,{text:texto,width:140,height:140,correctLevel:QRCode.CorrectLevel.M})}
-function desenhaBarras(texto){var s=$('bar');s.innerHTML='';if(!texto)return;try{JsBarcode(s,texto,{format:'CODE128',width:2,height:50,displayValue:false,margin:0})}catch(e){}$('bar-txt').textContent=texto}
-function atualiza(){$('passe').value=$('passe').value.replace(/\D/g,'').slice(0,9);var nome=val('nome'),idn=idDoNome(nome),turma=val('turma'),ano=val('ano'),curso=val('curso'),p9=pad9(val('passe')),end=val('end'),cont=val('cont');$('idn').value=idn;$('o-nome').textContent=nome||'[Nome do aluno]';$('o-id').textContent=idn||'[Gerado pelo nome]';$('o-turma').textContent=turma||'[Turma]';$('o-ano').textContent=ano||'[Ano]';$('o-curso').textContent=curso||'[Curso]';$('o-passe').textContent=p9;$('o-end').textContent=end;$('o-cont').textContent=cont;if(idn)desenhaQR(idn);else $('qr').innerHTML='';desenhaBarras(p9)}
+function desenhaQR(texto){
+  var el=$('qr');el.innerHTML='';
+  if(!texto)return;
+  new QRCode(el,{text:texto,width:140,height:140,correctLevel:QRCode.CorrectLevel.M});
+}
+function desenhaBarras(texto){
+  var s=$('bar');s.innerHTML='';
+  if(!texto){$('bar-txt').textContent='';return}
+  try{JsBarcode(s,texto,{format:'CODE128',width:1.6,height:48,displayValue:false,margin:0});}catch(e){}
+  $('bar-txt').textContent=texto;
+}
+function atualiza(){
+  $('passe').value=$('passe').value.replace(/\D/g,'').slice(0,9);
+  var nome=val('nome'),idn=idDoNome(nome),turma=val('turma'),ano=val('ano'),curso=val('curso'),
+      p9=pad9(val('passe')),end=val('end'),cont=val('cont');
+  $('idn').value=idn;
+  $('o-nome').textContent=nome||'[Nome do aluno]';
+  $('o-id').textContent=idn||'[Gerado pelo nome]';
+  $('o-turma').textContent=turma||'[Turma]';
+  $('o-ano').textContent=ano||'[Ano]';
+  $('o-curso').textContent=curso||'[Curso]';
+  $('o-passe').textContent=p9;
+  $('o-end').textContent=end;
+  $('o-cont').textContent=cont;
+  // QR: restantes dados, SEM o código de ID
+  var linhas=['ESCOLA FERNANDA'];
+  if(nome)linhas.push('Nome: '+nome);
+  if(turma)linhas.push('Turma: '+turma);
+  if(ano)linhas.push('Ano letivo: '+ano);
+  if(curso)linhas.push('Curso: '+curso);
+  if(p9)linhas.push('Passe: '+p9);
+  if(end)linhas.push('End: '+end);
+  if(cont)linhas.push('Tel: '+cont);
+  desenhaQR(linhas.join('\n'));
+  // Código de barras: só o ID (ex: ED-3761770)
+  desenhaBarras(idn||'');
+}
 ['nome','passe','turma','ano','curso','end','cont'].forEach(function(i){$(i).addEventListener('input',atualiza)});
-$('fin').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){var p=$('foto');p.style.backgroundImage='url("'+r.result+'")';p.textContent='';p.classList.add('ok')};r.readAsDataURL(f)});
-function prefillQuery(){try{var q=new URLSearchParams(location.search);if(q.get('nome'))$('nome').value=q.get('nome');if(q.get('passe'))$('passe').value=String(q.get('passe')).replace(/\D/g,'').slice(0,9);if(q.get('turma'))$('turma').value=q.get('turma');if(q.get('ano'))$('ano').value=q.get('ano');if(q.get('curso'))$('curso').value=q.get('curso')}catch(e){}}
+$('fin').addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){var p=$('foto');p.style.backgroundImage='url("'+r.result+'")';p.textContent='';p.classList.add('ok')};
+  r.readAsDataURL(f);
+});
+function prefillQuery(){
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.get('nome'))$('nome').value=q.get('nome');
+    if(q.get('passe'))$('passe').value=String(q.get('passe')).replace(/\D/g,'').slice(0,9);
+    if(q.get('turma'))$('turma').value=q.get('turma');
+    if(q.get('ano'))$('ano').value=q.get('ano');
+    if(q.get('curso'))$('curso').value=q.get('curso');
+  }catch(e){}
+}
 function escala(){var s=Math.min(1,(document.documentElement.clientWidth-24)/513);document.documentElement.style.setProperty('--esc',s.toFixed(3))}
-window.addEventListener('resize',escala);prefillQuery();escala();atualiza();
+window.addEventListener('resize',escala);
+prefillQuery();escala();atualiza();
 </script>
 </body>
 </html>
