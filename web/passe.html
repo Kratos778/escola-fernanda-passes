@@ -27,8 +27,8 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
 .onda .c1{fill:#d6ebe5}.onda .c2{fill:var(--verde)}
 .card>*:not(.onda){position:absolute}
 .logo{left:16px;top:12px;width:100px;height:100px;object-fit:contain}
-.titulo{left:122px;top:30px;font-weight:800;font-size:25px;line-height:1.08;color:var(--escuro);letter-spacing:.3px}
-.foto{right:22px;top:30px;width:126px;height:168px;border-radius:10px;border:2px dashed var(--verde);background:var(--claro) center 22%/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:var(--escuro);cursor:pointer;line-height:1.3}
+.titulo{left:122px;top:30px;font-weight:800;font-size:25px;line-height:1.08;color:var(--escuro)}
+.foto{right:22px;top:30px;width:126px;height:168px;border-radius:10px;border:2px dashed var(--verde);background:var(--claro) center/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:var(--escuro);cursor:pointer;line-height:1.3}
 .foto.ok{border-style:solid}
 .campos{left:24px;top:122px;width:325px}
 .campos .l{font-size:10.5px;font-weight:600;color:var(--escuro)}
@@ -41,12 +41,12 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
 .passe{font-size:31px;font-weight:800;letter-spacing:2.5px;line-height:1.1}
 .bar{margin-top:8px;width:280px;height:48px;background:#fff}
 .bar svg{width:100%;height:100%;display:block}
-.idbar{width:280px;text-align:center;font-size:12px;font-weight:700;letter-spacing:1.5px;margin-top:2px;min-height:14px}
+.idbar{width:280px;text-align:center;font-size:12px;font-weight:700;letter-spacing:1.5px;margin-top:2px;min-height:16px}
 .esq h2{font-size:13px;color:var(--escuro);margin:10px 0 4px;font-weight:800}
 .esq p{font-size:11.5px;line-height:1.4}
 .contacto{margin-top:8px;font-size:12px;font-weight:700;line-height:1.35}
-.qr{right:24px;top:30px;width:150px;height:150px;background:#fff;padding:5px;border-radius:8px;border:1px solid #cfe0d9}
-.qr svg{width:100%;height:100%;display:block}
+.qr{right:24px;top:30px;width:150px;height:150px;background:#fff;padding:4px;border-radius:8px;border:1px solid #cfe0d9;display:flex;align-items:center;justify-content:center}
+.qr img{width:140px;height:140px;display:block}
 @media print{body{background:#fff;padding:0}.painel{display:none}.cartoes{flex-direction:column;align-items:flex-start;gap:8mm}.card{box-shadow:0 0 0 .2mm #bbb;zoom:.631;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
@@ -55,12 +55,12 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
   <div style="margin-bottom:12px"><a href="index.html" style="color:#136650;font-weight:700;text-decoration:none;font-size:14px">← Voltar ao painel</a></div>
   <h1>Dados do aluno</h1>
   <div class="grelha">
-    <label class="full">Nome completo<input type="text" id="nome" autocomplete="off" placeholder="Ex: Ana Beatriz Fernandes"></label>
-    <label>Nº de identificação (código de barras)<input type="text" id="idn" readonly placeholder="Automático"></label>
+    <label class="full">Nome completo<input type="text" id="nome" autocomplete="off"></label>
+    <label>Nº de identificação (código de barras)<input type="text" id="idn" readonly></label>
     <label>Nº do passe<input type="text" id="passe" inputmode="numeric" maxlength="9" value="1"></label>
-    <label>Turma<input type="text" id="turma" placeholder="Ex: 9ª A"></label>
-    <label>Ano letivo<input type="text" id="ano" placeholder="Ex: 2026/2027"></label>
-    <label>Curso<input type="text" id="curso" placeholder="Ex: Informática"></label>
+    <label>Turma<input type="text" id="turma"></label>
+    <label>Ano letivo<input type="text" id="ano"></label>
+    <label>Curso<input type="text" id="curso"></label>
     <label>Endereço da escola<input type="text" id="end" value="Rua Patrice Lumumba"></label>
     <label>Telefone<input type="text" id="cont" value="+244 922 673 478"></label>
   </div>
@@ -70,7 +70,7 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
     <button class="btn sec" type="button" onclick="window.print()">Imprimir</button>
     <a class="btn sec" href="index.html">← Voltar</a>
   </div>
-  <p class="dica">Barras = ID (ED-…). QR = nome, turma, ano, curso, passe. Offline, sem internet.</p>
+  <p class="dica">Código de barras = ID. QR = restantes dados. Foto e imprimir no Chrome.</p>
   <input type="file" accept="image/*" id="fin" style="position:absolute;width:1px;height:1px;opacity:0">
 </div>
 <div class="cartoes">
@@ -100,53 +100,50 @@ body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#d9ddd8
       <p>Propriedade da escola. Se encontrado, devolva-o.</p>
       <div class="contacto"><span id="o-end"></span><br><span id="o-cont"></span></div>
     </div>
-    <div class="qr"><svg id="qr" viewBox="0 0 10 10" shape-rendering="crispEdges"></svg></div>
+    <div class="qr" id="qrbox"><img id="qrimg" alt="QR" width="140" height="140" style="display:none"></div>
   </div>
 </div>
 <script src="logo-data.js"></script>
-<script src="qr-offline.js"></script>
 <script>
+var C128=["212222","222122","222221","121223","121322","131222","122213","122312","132212","221213","221312","231212","112232","122132","122231","113222","123122","123221","223211","221132","221231","213212","223112","312131","311222","321122","321221","312212","322112","322211","212123","212321","232121","111323","131123","131321","112313","132113","132311","211313","231113","231311","112133","112331","132131","113123","113321","133121","313121","211331","231131","213113","213311","213131","311123","311321","331121","312113","312311","332111","314111","221411","431111","111224","111422","121124","121421","141122","141221","112214","112412","122114","122411","142112","142211","241211","221114","413111","241112","134111","111242","121142","121241","114212","124112","124211","411212","421112","421211","212141","214121","412121","111143","111341","131141","114113","114311","411113","411311","113141","114131","311141","411131","211412","211214","211232","2331112"];
+function $(i){return document.getElementById(i)}
+function val(i){return $(i).value.trim()}
 function desenhaQR(texto){
-  if(typeof QRCodeLib==='undefined'){return;}
-  var q=new QRCodeLib(0,0);
-  q.addData(unescape(encodeURIComponent(texto)));
-  q.make();
-  var n=q.getModuleCount(),m=2,h='';
-  for(var r=0;r<n;r++)for(var c=0;c<n;c++)
-    if(q.isDark(r,c))h+='<rect x="'+(c+m)+'" y="'+(r+m)+'" width="1.02" height="1.02"/>';
-  var s=document.getElementById('qr');
-  if(!s)return;
-  s.setAttribute('viewBox','0 0 '+(n+2*m)+' '+(n+2*m));
-  s.innerHTML='<rect width="100%" height="100%" fill="#fff"/><g fill="#000">'+h+'</g>';
+  var img=$('qrimg');
+  if(!texto){img.style.display='none';img.removeAttribute('src');return;}
+  img.style.display='block';
+  img.src='https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=0&data='+encodeURIComponent(texto);
 }
 function desenhaBarras(texto){
-  var s=document.getElementById('bar');
-  if(!s)return;
-  if(!texto){s.innerHTML='';var bt=document.getElementById('bar-txt');if(bt)bt.textContent='';return;}
-  if(typeof C128==='undefined')return;
+  var s=$('bar');
+  if(!texto){s.innerHTML='';$('bar-txt').textContent='';return;}
   var cods=[104],soma=104,i;
   for(i=0;i<texto.length;i++){var v=texto.charCodeAt(i)-32;if(v<0||v>95)v=0;cods.push(v);soma+=v*(i+1);}
   cods.push(soma%103,106);
-  var pad=0,x=pad,h='';
+  var x=0,h='';
   cods.forEach(function(c){var p=C128[c];if(!p)return;
     for(var k=0;k<p.length;k++){var w=+p[k];if(k%2==0)h+='<rect x="'+x+'" y="0" width="'+w+'" height="60"/>';x+=w;}});
-  s.setAttribute('viewBox','0 0 '+(x+pad)+' 60');
+  s.setAttribute('viewBox','0 0 '+x+' 60');
   s.innerHTML='<g fill="#000">'+h+'</g>';
-  var bt=document.getElementById('bar-txt');if(bt)bt.textContent=texto;
+  $('bar-txt').textContent=texto;
 }
 function semAcentos(t){return t.normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function cyrb53(str){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0;i<str.length;i++){var ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0)}
 function idDoNome(nome){var p=semAcentos(nome).toUpperCase().replace(/[^A-Z ]/g,' ').split(/\s+/).filter(Boolean);if(!p.length)return '';var ini=p[0].charAt(0)+(p.length>1?p[p.length-1].charAt(0):(p[0].charAt(1)||'X'));var d=String(cyrb53(p.join(' '))%10000000);while(d.length<7)d='0'+d;return ini+'-'+d}
 function pad9(v){v=String(v||'').replace(/\D/g,'').slice(0,9);return ('000000000'+v).slice(-9)}
-function $(i){return document.getElementById(i)}
-function val(i){return $(i).value.trim()}
-var KEYS=['passe','turma','ano','curso','end','cont'];
-function guarda(){try{var o={};KEYS.forEach(function(k){o[k]=$(k).value});localStorage.setItem('fernanda_passe_v2',JSON.stringify(o))}catch(e){}}
-function restaura(){try{var o=JSON.parse(localStorage.getItem('fernanda_passe_v2')||'null');if(o)KEYS.forEach(function(k){if(o[k]!=null)$(k).value=o[k]})}catch(e){}}
 function atualiza(){
   $('passe').value=$('passe').value.replace(/\D/g,'').slice(0,9);
-  var nome=val('nome'),idn=idDoNome(nome),turma=val('turma'),ano=val('ano'),curso=val('curso'),p9=pad9(val('passe')),end=val('end'),cont=val('cont');
-  $('idn').value=idn;$('o-nome').textContent=nome||'[Nome do aluno]';$('o-id').textContent=idn||'[Gerado pelo nome]';$('o-turma').textContent=turma||'[Turma]';$('o-ano').textContent=ano||'[Ano]';$('o-curso').textContent=curso||'[Curso]';$('o-passe').textContent=p9;$('o-end').textContent=end;$('o-cont').textContent=cont;
+  var nome=val('nome'),idn=idDoNome(nome),turma=val('turma'),ano=val('ano'),curso=val('curso'),
+      p9=pad9(val('passe')),end=val('end'),cont=val('cont');
+  $('idn').value=idn;
+  $('o-nome').textContent=nome||'[Nome do aluno]';
+  $('o-id').textContent=idn||'[Gerado pelo nome]';
+  $('o-turma').textContent=turma||'[Turma]';
+  $('o-ano').textContent=ano||'[Ano]';
+  $('o-curso').textContent=curso||'[Curso]';
+  $('o-passe').textContent=p9;
+  $('o-end').textContent=end;
+  $('o-cont').textContent=cont;
   var L=['ESCOLA FERNANDA'];
   if(nome)L.push('Nome: '+nome);
   if(turma)L.push('Turma: '+turma);
@@ -155,18 +152,16 @@ function atualiza(){
   L.push('Passe: '+p9);
   if(end)L.push('End: '+end);
   if(cont)L.push('Tel: '+cont);
-  try{if(L.length>1)desenhaQR(L.join('\n'));else{var qs=$('qr');if(qs)qs.innerHTML='<rect width="100%" height="100%" fill="#fff"/>';}}
-  catch(e){}
-  try{desenhaBarras(idn||'');}catch(e){}
+  desenhaQR(L.length>1?L.join('\n'):'');
+  desenhaBarras(idn||'');
 }
-['nome','passe','turma','ano','curso','end','cont'].forEach(function(i){$(i).addEventListener('input',function(){atualiza();guarda()})});
-function limpaFoto(){var f=$('foto');f.style.backgroundImage='';f.classList.remove('ok');f.innerHTML='Toque para<br>pôr a foto';$('fin').value=''}
+['nome','passe','turma','ano','curso','end','cont'].forEach(function(i){$(i).addEventListener('input',atualiza)});
 $('fin').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){var p=$('foto');p.style.backgroundImage='url("'+r.result+'")';p.textContent='';p.classList.add('ok')};r.readAsDataURL(f)});
-$('prox').addEventListener('click',function(){var n=parseInt($('passe').value||'0',10)+1;$('passe').value=String(Math.min(n,999999999));$('nome').value='';limpaFoto();atualiza();guarda();$('nome').focus()});
+$('prox').addEventListener('click',function(){var n=parseInt($('passe').value||'0',10)+1;$('passe').value=String(Math.min(n,999999999));$('nome').value='';$('foto').style.backgroundImage='';$('foto').classList.remove('ok');$('foto').innerHTML='Toque para<br>pôr a foto';$('fin').value='';atualiza();$('nome').focus()});
 function prefillQuery(){try{var q=new URLSearchParams(location.search);if(q.get('nome'))$('nome').value=q.get('nome');if(q.get('passe'))$('passe').value=String(q.get('passe')).replace(/\D/g,'').slice(0,9);if(q.get('turma'))$('turma').value=q.get('turma');if(q.get('ano'))$('ano').value=q.get('ano');if(q.get('curso'))$('curso').value=q.get('curso')}catch(e){}}
 function escala(){var s=Math.min(1,(document.documentElement.clientWidth-24)/513);document.documentElement.style.setProperty('--esc',s.toFixed(3))}
 window.addEventListener('resize',escala);
-prefillQuery();restaura();escala();atualiza();
+prefillQuery();escala();atualiza();
 </script>
 </body>
 </html>
