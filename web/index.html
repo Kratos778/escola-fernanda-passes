@@ -14,10 +14,10 @@
 .login-logo{width:68px;height:68px;border-radius:18px;margin:0 auto 16px;background:linear-gradient(135deg,#dff7ee,#b8ead9);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--escuro)}
 .login-card h1{text-align:center;font-size:22px;color:var(--escuro);margin-bottom:4px}.login-card .sub{text-align:center;font-size:14px;color:var(--muted);margin-bottom:22px}
 .field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}
-.field input,.field select{width:100%;padding:12px 14px;border:1.5px solid var(--linha);border-radius:12px;font-size:15px;background:#fafcfb;transition:border .2s,box-shadow .2s}
+.field input,.field select{width:100%;padding:12px 14px;border:1.5px solid var(--linha);border-radius:12px;font-size:15px;background:#fafcfb}
 .field input:focus,.field select:focus{outline:none;border-color:var(--verde);box-shadow:0 0 0 3px rgba(34,168,132,.18)}
-.btn-primary{width:100%;margin-top:8px;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,#22a884,#18906f);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s,filter .15s}
-.btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-primary{width:100%;margin-top:8px;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,#22a884,#18906f);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed}
 .login-err{margin-top:12px;padding:10px;border-radius:10px;background:#fdecea;color:var(--erro);font-size:13px;text-align:center}
 .login-hint{margin-top:16px;font-size:12px;color:var(--muted);text-align:center}
 #app-screen{min-height:100vh;display:flex;flex-direction:column}
@@ -25,38 +25,30 @@
 .topbar .brand{font-weight:800;font-size:16px}.topbar .user{font-size:12px;opacity:.9;margin-top:2px}
 .topbar .btn-out{background:rgba(255,255,255,.15);border:0;color:#fff;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13px}
 .tabs{background:#fff;border-bottom:1px solid var(--linha);display:flex;gap:4px;padding:8px 12px;overflow-x:auto;position:sticky;top:0;z-index:10}
-.tabs button{border:0;background:transparent;padding:9px 14px;border-radius:999px;font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .2s}
+.tabs button{border:0;background:transparent;padding:9px 14px;border-radius:999px;font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
 .tabs button.on{background:var(--claro);color:var(--escuro)}
 .main{max-width:1080px;width:100%;margin:0 auto;padding:18px 12px 48px;flex:1}
-.card{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--sombra);margin-bottom:14px;border:1px solid rgba(14,92,74,.05);animation:fadeIn .35s ease}
+.card{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--sombra);margin-bottom:14px;animation:fadeIn .35s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .card h2{font-size:16px;color:var(--escuro);margin-bottom:4px}.card .hint{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.4}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.grid .full{grid-column:1/-1}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:700;font-size:13px;cursor:pointer;background:var(--verde);color:#fff;transition:transform .15s,filter .15s}
-.btn:hover{filter:brightness(1.06);transform:translateY(-1px)}.btn.sec{background:var(--claro);color:var(--escuro)}
-.toast{margin-top:12px;padding:11px 13px;border-radius:11px;font-size:13px;display:none}.toast.show{display:block;animation:fadeIn .25s ease}
+.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:700;font-size:13px;cursor:pointer;background:var(--verde);color:#fff}.btn.sec{background:var(--claro);color:var(--escuro)}
+.toast{margin-top:12px;padding:11px 13px;border-radius:11px;font-size:13px;display:none}.toast.show{display:block}
 .toast.ok{background:#e8f7ef;color:var(--ok)}.toast.err{background:#fdecea;color:var(--erro)}.toast.info{background:#e7f3fb;color:#0b5f8a}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px}
-.stat{background:#fff;border-radius:14px;padding:14px;box-shadow:var(--sombra);transition:transform .2s}.stat:hover{transform:translateY(-2px)}
-.stat .n{font-size:24px;font-weight:800;color:var(--escuro)}.stat .l{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
+.stat{background:#fff;border-radius:14px;padding:14px;box-shadow:var(--sombra)}.stat .n{font-size:24px;font-weight:800;color:var(--escuro)}.stat .l{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
 .filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:flex-end}.filtros .field{margin:0;min-width:140px;flex:1}
-.grupo{margin-bottom:18px}
-.grupo-titulo{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-radius:12px;background:linear-gradient(90deg,#e8f8f3,#f5fbf8);border:1px solid #cfe9df;margin-bottom:10px}
-.grupo-titulo h3{font-size:14px;color:var(--escuro);font-weight:800}
-.grupo-titulo .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#fff;color:var(--muted);border:1px solid var(--linha)}
+.grupo{margin-bottom:18px}.grupo-titulo{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-radius:12px;background:linear-gradient(90deg,#e8f8f3,#f5fbf8);border:1px solid #cfe9df;margin-bottom:10px}
+.grupo-titulo h3{font-size:14px;color:var(--escuro);font-weight:800}.grupo-titulo .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#fff;color:var(--muted);border:1px solid var(--linha)}
 .aluno-list{display:flex;flex-direction:column;gap:8px}
-.aluno-item{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;transition:box-shadow .2s,border-color .2s,transform .15s}
-.aluno-item:hover{border-color:#b5d9cb;box-shadow:0 4px 16px rgba(14,92,74,.08);transform:translateY(-1px)}
+.aluno-item{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
 .aluno-item .nome{font-weight:800;font-size:14px;color:var(--escuro)}.aluno-item .meta{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
 .aluno-item .meta code{background:var(--claro);color:var(--escuro);padding:2px 6px;border-radius:6px;font-size:11px;font-weight:700}
 .badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:800}
 .badge.ok{background:#e8f7ef;color:var(--ok)}.badge.warn{background:#fff6dd;color:#9a6700}.badge.bad{background:#fdecea;color:var(--erro)}
-.row-actions{display:flex;flex-direction:column;gap:5px}
-.row-actions button{padding:7px 11px;font-size:11px;border-radius:8px;border:0;background:var(--claro);color:var(--escuro);cursor:pointer;font-weight:700;white-space:nowrap}
-.result-box{margin-top:12px;padding:14px;background:linear-gradient(135deg,#e8f8f3,#f7fcfa);border-radius:12px;font-size:13px;line-height:1.5;display:none;border:1px solid #cfe9df}
-.result-box.show{display:block;animation:fadeIn .3s ease}.result-box .big-id{font-size:17px;font-weight:800;color:var(--escuro);margin:4px 0}
-.note{font-size:12px;color:var(--muted);margin-top:6px}
+.row-actions{display:flex;flex-direction:column;gap:5px}.row-actions button{padding:7px 11px;font-size:11px;border-radius:8px;border:0;background:var(--claro);color:var(--escuro);cursor:pointer;font-weight:700}
+.result-box{margin-top:12px;padding:14px;background:linear-gradient(135deg,#e8f8f3,#f7fcfa);border-radius:12px;font-size:13px;line-height:1.5;display:none;border:1px solid #cfe9df}.result-box.show{display:block}.result-box .big-id{font-size:17px;font-weight:800;color:var(--escuro);margin:4px 0}.note{font-size:12px;color:var(--muted);margin-top:6px}
 @media(max-width:640px){.aluno-item{grid-template-columns:1fr}.row-actions{flex-direction:row;flex-wrap:wrap}}
 </style>
 </head>
@@ -80,21 +72,21 @@
 <div class="stat"><div class="n" id="st-emdia">—</div><div class="l">Propina em dia</div></div>
 <div class="stat"><div class="n" id="st-atraso">—</div><div class="l">Em atraso / sem pago</div></div></div>
 <div class="card"><h2>Novo aluno e passe</h2>
-<p class="hint">O <strong>nº de identificação</strong> (ex. ED-3761770) vai no QR. Ano letivo = período académico.</p>
+<p class="hint">Curso, turma e ano são <strong>livres</strong> — escreves o que a escola usa (qualquer curso, não só Informática). O nº de identificação vai no QR.</p>
 <div class="grid">
 <div class="field full"><label>Código de administração</label><input type="password" id="a-admin"></div>
 <div class="field full"><label>Nome completo</label><input id="a-nome" placeholder="Ex: Ana Beatriz Fernandes"></div>
 <div class="field"><label>Nº identificação (QR)</label><input id="a-codigo-id" placeholder="ED-0123456"></div>
-<div class="field"><label>Curso</label><input id="a-curso" placeholder="Informática" list="lista-cursos"></div>
-<div class="field"><label>Turma</label><input id="a-turma" placeholder="10ª A" list="lista-turmas"></div>
-<div class="field"><label>Ano letivo / período</label><input id="a-ano" placeholder="2026/2027" list="lista-anos"></div>
+<div class="field"><label>Curso (manual)</label><input id="a-curso" placeholder="Ex: Economia, Mecânica…" list="lista-cursos"></div>
+<div class="field"><label>Turma (manual)</label><input id="a-turma" placeholder="Ex: 9ª B, 12ª C…" list="lista-turmas"></div>
+<div class="field"><label>Ano letivo / período (manual)</label><input id="a-ano" placeholder="Ex: 2025/2026, 2026/2027…" list="lista-anos"></div>
 </div>
 <datalist id="lista-cursos"></datalist><datalist id="lista-turmas"></datalist><datalist id="lista-anos"></datalist>
 <div class="actions"><button class="btn sec" type="button" id="btn-gen-id">Gerar ID pelo nome</button>
 <button class="btn" type="button" id="btn-criar">Criar aluno e passe</button></div>
 <div class="toast" id="a-toast"></div><div class="result-box" id="a-result"></div></div>
 <div class="card"><h2>Lista por curso · turma · ano</h2>
-<p class="hint">Filtra ou vê tudo agrupado. Propina e nº do passe em cada cartão.</p>
+<p class="hint">Filtros e grupos usam o que tu escreveste em cada aluno.</p>
 <div class="filtros">
 <div class="field"><label>Curso</label><select id="f-curso"><option value="">Todos</option></select></div>
 <div class="field"><label>Turma</label><select id="f-turma"><option value="">Todas</option></select></div>
@@ -105,7 +97,7 @@
 </section>
 <section id="tab-propinas" class="hidden">
 <div class="card"><h2>Confirmar pagamento</h2>
-<p class="hint">Botão <strong>Pagar propina</strong> na lista. 1 período de propina = 30 dias.</p>
+<p class="hint">1 período de propina = 30 dias.</p>
 <div class="grid">
 <div class="field full"><label>ID interno (uuid)</label><input id="p-aluno"></div>
 <div class="field"><label>Valor (AOA)</label><input id="p-valor" type="number" min="0" step="1" placeholder="15000"></div>
@@ -122,7 +114,7 @@
 </section>
 <section id="tab-admin" class="hidden">
 <div class="card"><h2>Código de administração</h2>
-<p class="hint">Define-se <strong>uma vez</strong> no servidor.</p>
+<p class="hint">Define-se uma vez no servidor.</p>
 <div class="field"><label>Novo código (mín. 8)</label><input type="password" id="c-codigo"></div>
 <div class="actions"><button class="btn" type="button" id="btn-def-codigo">Definir no servidor</button></div>
 <div class="toast" id="c-toast"></div></div>
@@ -144,16 +136,16 @@ $('btn-login').onclick=async()=>{const err=$('login-err');err.classList.add('hid
 $('btn-logout').onclick=async()=>{await sb.auth.signOut();goLogin()};
 document.querySelectorAll('.tabs button').forEach(btn=>{btn.onclick=()=>{document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['alunos','propinas','movimentos','admin'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==btn.dataset.tab));if(btn.dataset.tab==='movimentos')carregarMovimentos();if(btn.dataset.tab==='alunos')carregarAlunos()}});
 $('btn-gen-id').onclick=()=>{$('a-codigo-id').value=idDoNome($('a-nome').value)};
-$('btn-criar').onclick=async()=>{const t=$('a-toast'),box=$('a-result');box.classList.remove('show');toast(t,'A criar…','info');const {data,error}=await sb.rpc('criar_aluno_e_passe',{p_codigo_admin:$('a-admin').value,p_nome:$('a-nome').value.trim(),p_codigo_id:$('a-codigo-id').value.trim(),p_turma:$('a-turma').value.trim()||null,p_ano_letivo:$('a-ano').value.trim()||null,p_curso:$('a-curso').value.trim()||null});if(error){const msg=error.message||'Erro';if(/já existe|identifica/i.test(msg))toast(t,'Este ID já existe. Atualiza a lista.','err');else toast(t,msg,'err');return}if(data&&data.ok===false){toast(t,data.erro||'Falhou','err');return}toast(t,'Aluno e passe criados.','ok');const num=pad9(data.numero),cid=$('a-codigo-id').value.trim();box.innerHTML='<div class="big-id">QR / ID: '+cid+'</div><div><strong>Nº passe (barras):</strong> '+num+'</div><div class="note">Ano/período: '+($('a-ano').value.trim()||'—')+' · Curso: '+($('a-curso').value.trim()||'—')+' · Turma: '+($('a-turma').value.trim()||'—')+'</div><div class="note">ID interno: '+data.aluno_id+'</div>';box.classList.add('show');$('p-aluno').value=data.aluno_id||'';carregarAlunos()};
+$('btn-criar').onclick=async()=>{const t=$('a-toast'),box=$('a-result');box.classList.remove('show');toast(t,'A criar…','info');const {data,error}=await sb.rpc('criar_aluno_e_passe',{p_codigo_admin:$('a-admin').value,p_nome:$('a-nome').value.trim(),p_codigo_id:$('a-codigo-id').value.trim(),p_turma:$('a-turma').value.trim()||null,p_ano_letivo:$('a-ano').value.trim()||null,p_curso:$('a-curso').value.trim()||null});if(error){const msg=error.message||'Erro';if(/já existe|identifica/i.test(msg))toast(t,'Este ID já existe. Atualiza a lista.','err');else toast(t,msg,'err');return}if(data&&data.ok===false){toast(t,data.erro||'Falhou','err');return}toast(t,'Aluno e passe criados.','ok');const num=pad9(data.numero),cid=$('a-codigo-id').value.trim();box.innerHTML='<div class="big-id">QR / ID: '+cid+'</div><div><strong>Nº passe:</strong> '+num+'</div><div class="note">Ano: '+($('a-ano').value.trim()||'—')+' · Curso: '+($('a-curso').value.trim()||'—')+' · Turma: '+($('a-turma').value.trim()||'—')+'</div>';box.classList.add('show');$('p-aluno').value=data.aluno_id||'';carregarAlunos()};
 function preencherFiltros(data){const cursos=[...new Set(data.map(a=>a.curso).filter(Boolean))].sort();const turmas=[...new Set(data.map(a=>a.turma).filter(Boolean))].sort();const anos=[...new Set(data.map(a=>a.ano_letivo).filter(Boolean))].sort();const fill=(sel,arr,all)=>{const cur=sel.value;sel.innerHTML='<option value="">'+all+'</option>'+arr.map(v=>'<option value="'+v+'">'+v+'</option>').join('');if(arr.includes(cur))sel.value=cur};fill($('f-curso'),cursos,'Todos');fill($('f-turma'),turmas,'Todas');fill($('f-ano'),anos,'Todos');$('lista-cursos').innerHTML=cursos.map(c=>'<option value="'+c+'">').join('');$('lista-turmas').innerHTML=turmas.map(c=>'<option value="'+c+'">').join('');$('lista-anos').innerHTML=anos.map(c=>'<option value="'+c+'">').join('')}
-function renderLista(){const box=$('lista-alunos');let data=alunosCache.slice();const fc=$('f-curso').value,ft=$('f-turma').value,fa=$('f-ano').value;if(fc)data=data.filter(a=>a.curso===fc);if(ft)data=data.filter(a=>a.turma===ft);if(fa)data=data.filter(a=>a.ano_letivo===fa);if(!data.length){box.innerHTML='<p class="hint">Nenhum aluno com estes filtros.</p>';return}const grupos={};data.forEach(a=>{const curso=a.curso||'Sem curso',ano=a.ano_letivo||'Sem ano/período',turma=a.turma||'Sem turma',key=curso+'||'+ano+'||'+turma;if(!grupos[key])grupos[key]={curso,ano,turma,alunos:[]};grupos[key].alunos.push(a)});box.innerHTML=Object.keys(grupos).sort().map(k=>{const g=grupos[k];const cards=g.alunos.map(a=>{const passe=a.passe_numero!=null?pad9(a.passe_numero)+' · '+(a.passe_estado||''):'sem passe';return '<div class="aluno-item"'+(a.ativo===false?' style="opacity:.65"':'')+'><div><div class="nome">'+(a.nome||'')+(a.ativo===false?' <span class="badge bad">Inactivo</span>':'')+'</div><div class="meta">ID cartão: <code>'+(a.codigo_id||'—')+'</code></div><div class="meta" style="margin-top:4px">'+propBadge(a.estado_propina)+(a.vencimento?' · venc. '+a.vencimento:'')+' · Passe: '+passe+'</div></div><div class="row-actions"><button type="button" data-pay="'+(a.aluno_id||'')+'">Pagar propina</button>'+(a.ativo===false?'<button type="button" data-react="'+(a.aluno_id||'')+'">Reactivar</button>':'<button type="button" data-off="'+(a.aluno_id||'')+'" style="background:#fdecea;color:#c62828">Desactivar</button>')+'</div></div>'}).join('');return '<div class="grupo"><div class="grupo-titulo"><h3>'+g.curso+'</h3><span class="chip">'+g.turma+'</span><span class="chip">'+g.ano+'</span><span class="chip">'+g.alunos.length+' aluno'+(g.alunos.length!==1?'s':'')+'</span></div><div class="aluno-list">'+cards+'</div></div>'}).join('');box.querySelectorAll('[data-pay]').forEach(b=>{b.onclick=()=>{$('p-aluno').value=b.getAttribute('data-pay');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));document.querySelector('.tabs button[data-tab="propinas"]').classList.add('on');['alunos','propinas','movimentos','admin'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!=='propinas'))}});box.querySelectorAll('[data-off]').forEach(b=>{b.onclick=()=>desactivarAluno(b.getAttribute('data-off'),false)});box.querySelectorAll('[data-react]').forEach(b=>{b.onclick=()=>desactivarAluno(b.getAttribute('data-react'),true)})}
-async function carregarAlunos(){const box=$('lista-alunos');const {data,error}=await sb.from('vw_estado_alunos').select('*').order('nome');if(error){box.innerHTML='<p class="toast show err" style="display:block">'+(error.message||'Erro')+'</p>';$('st-total').textContent='?';$('st-emdia').textContent='?';$('st-atraso').textContent='?';return}alunosCache=data||[];if(!alunosCache.length){box.innerHTML='<p class="hint">Ainda não há alunos.</p>';$('st-total').textContent='0';$('st-emdia').textContent='0';$('st-atraso').textContent='0';return}let em=0,at=0;alunosCache.forEach(a=>{if(a.estado_propina==='em_dia')em++;else at++});$('st-total').textContent=String(alunosCache.length);$('st-emdia').textContent=String(em);$('st-atraso').textContent=String(at);preencherFiltros(alunosCache);renderLista()}
+function renderLista(){const box=$('lista-alunos');let data=alunosCache.slice();const fc=$('f-curso').value,ft=$('f-turma').value,fa=$('f-ano').value;if(fc)data=data.filter(a=>a.curso===fc);if(ft)data=data.filter(a=>a.turma===ft);if(fa)data=data.filter(a=>a.ano_letivo===fa);if(!data.length){box.innerHTML='<p class="hint">Nenhum aluno com estes filtros.</p>';return}const grupos={};data.forEach(a=>{const curso=a.curso||'Sem curso',ano=a.ano_letivo||'Sem ano/período',turma=a.turma||'Sem turma',key=curso+'||'+ano+'||'+turma;if(!grupos[key])grupos[key]={curso,ano,turma,alunos:[]};grupos[key].alunos.push(a)});box.innerHTML=Object.keys(grupos).sort().map(k=>{const g=grupos[k];const cards=g.alunos.map(a=>{const passe=a.passe_numero!=null?pad9(a.passe_numero)+' · '+(a.passe_estado||''):'sem passe';return '<div class="aluno-item"'+(a.ativo===false?' style="opacity:.65"':'')+'><div><div class="nome">'+(a.nome||'')+(a.ativo===false?' <span class="badge bad">Inactivo</span>':'')+'</div><div class="meta">ID: <code>'+(a.codigo_id||'—')+'</code></div><div class="meta">'+propBadge(a.estado_propina)+(a.vencimento?' · venc. '+a.vencimento:'')+' · Passe: '+passe+'</div></div><div class="row-actions"><button type="button" data-pay="'+(a.aluno_id||'')+'">Pagar propina</button>'+(a.ativo===false?'<button type="button" data-react="'+(a.aluno_id||'')+'">Reactivar</button>':'<button type="button" data-off="'+(a.aluno_id||'')+'" style="background:#fdecea;color:#c62828">Desactivar</button>')+'</div></div>'}).join('');return '<div class="grupo"><div class="grupo-titulo"><h3>'+g.curso+'</h3><span class="chip">'+g.turma+'</span><span class="chip">'+g.ano+'</span><span class="chip">'+g.alunos.length+'</span></div><div class="aluno-list">'+cards+'</div></div>'}).join('');box.querySelectorAll('[data-pay]').forEach(b=>{b.onclick=()=>{$('p-aluno').value=b.getAttribute('data-pay');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));document.querySelector('.tabs button[data-tab="propinas"]').classList.add('on');['alunos','propinas','movimentos','admin'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!=='propinas'))}});box.querySelectorAll('[data-off]').forEach(b=>{b.onclick=()=>desactivarAluno(b.getAttribute('data-off'),false)});box.querySelectorAll('[data-react]').forEach(b=>{b.onclick=()=>desactivarAluno(b.getAttribute('data-react'),true)})}
+async function carregarAlunos(){const box=$('lista-alunos');const {data,error}=await sb.from('vw_estado_alunos').select('*').order('nome');if(error){box.innerHTML='<p class="toast show err" style="display:block">'+(error.message||'Erro')+'</p>';return}alunosCache=data||[];if(!alunosCache.length){box.innerHTML='<p class="hint">Ainda não há alunos.</p>';$('st-total').textContent='0';$('st-emdia').textContent='0';$('st-atraso').textContent='0';return}let em=0,at=0;alunosCache.forEach(a=>{if(a.estado_propina==='em_dia')em++;else at++});$('st-total').textContent=String(alunosCache.length);$('st-emdia').textContent=String(em);$('st-atraso').textContent=String(at);preencherFiltros(alunosCache);renderLista()}
 $('btn-refresh-alunos').onclick=carregarAlunos;$('f-curso').onchange=renderLista;$('f-turma').onchange=renderLista;$('f-ano').onchange=renderLista;
 async function desactivarAluno(alunoId,ativo){const codigo=prompt(ativo?'Código admin para REACTIVAR:':'Código admin para DESACTIVAR:');if(codigo==null)return;if(!codigo.trim()){alert('Código obrigatório.');return}if(!ativo&&!confirm('Desactivar? O passe fica bloqueado.'))return;const {data,error}=await sb.rpc('definir_aluno_ativo',{p_codigo_admin:codigo,p_aluno_id:alunoId,p_ativo:ativo,p_motivo:ativo?null:'Desactivado pela secretaria'});if(error){alert(error.message||'Erro');return}if(data&&data.ok===false){alert(data.erro||'Falhou');return}alert(ativo?'Reactivado.':'Desactivado.');carregarAlunos()}
 $('btn-pagar').onclick=async()=>{const t=$('p-toast');toast(t,'A confirmar…','info');const {data,error}=await sb.rpc('confirmar_pagamento',{p_aluno_id:$('p-aluno').value.trim(),p_ref_transacao:crypto.randomUUID(),p_valor:Number($('p-valor').value),p_recibo:$('p-recibo').value.trim(),p_periodos:Number($('p-periodos').value)||1});if(error){toast(t,error.message||'Erro','err');return}toast(t,'Pago. Vencimento: '+(data&&data.vencimento_novo?data.vencimento_novo:'—'),'ok');carregarAlunos()};
 async function carregarMovimentos(){const box=$('lista-mov');const {data,error}=await sb.rpc('listar_movimentos_recentes',{p_limite:40});if(error){box.innerHTML='<p class="toast show err" style="display:block">'+(error.message||'Erro')+'</p>';return}const rows=Array.isArray(data)?data:[];if(!rows.length){box.innerHTML='<p class="hint">Sem movimentos.</p>';return}box.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid #d5e4de">Quando</th><th style="text-align:left;padding:8px;border-bottom:1px solid #d5e4de">Tipo</th><th style="text-align:left;padding:8px;border-bottom:1px solid #d5e4de">Resultado</th><th style="text-align:left;padding:8px;border-bottom:1px solid #d5e4de">Aluno</th></tr></thead><tbody>'+rows.map(m=>{const q=String(m.ocorrido_em||'').replace('T',' ').slice(0,19);return '<tr><td style="padding:8px;border-bottom:1px solid #eef2f0">'+q+'</td><td style="padding:8px;border-bottom:1px solid #eef2f0">'+(m.tipo||'')+'</td><td style="padding:8px;border-bottom:1px solid #eef2f0">'+(m.resultado||'')+'</td><td style="padding:8px;border-bottom:1px solid #eef2f0">'+(m.aluno_nome||'—')+'</td></tr>'}).join('')+'</tbody></table>'}
 $('btn-refresh-mov').onclick=carregarMovimentos;
-$('btn-def-codigo').onclick=async()=>{const t=$('c-toast');toast(t,'A definir…','info');const {error}=await sb.rpc('definir_codigo_admin',{p_codigo:$('c-codigo').value});if(error){toast(t,error.message||'Já definido ou sem permissão','err');return}toast(t,'Código definido.','ok')};
+$('btn-def-codigo').onclick=async()=>{const t=$('c-toast');toast(t,'A definir…','info');const {error}=await sb.rpc('definir_codigo_admin',{p_codigo:$('c-codigo').value});if(error){toast(t,error.message||'Erro','err');return}toast(t,'Código definido.','ok')};
 sb.auth.onAuthStateChange((_e,s)=>{if(s)goApp(s);else goLogin()});boot();
 </script>
 </body>
