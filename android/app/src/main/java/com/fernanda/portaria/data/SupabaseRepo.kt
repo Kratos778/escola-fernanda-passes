@@ -48,21 +48,23 @@ class SupabaseRepo(private val context: Context) {
 
     suspend fun registarLeitura(
         token: String,
-        tipo: TipoMovimento,
+        tipo: TipoMovimento = TipoMovimento.auto,
         offline: Boolean = false,
         decisaoLocal: String? = null,
         eventoId: String = UUID.randomUUID().toString()
     ): RespostaLeitura {
+        val tipoEnvio = tipo.name
         if (!temInternet() || offline) {
+            val tipoLocal = if (tipo == TipoMovimento.auto) TipoMovimento.entrada.name else tipo.name
             db.eventoDao().inserir(
-                EventoPendente(id = eventoId, token = token, tipo = tipo.name, decisaoLocal = decisaoLocal)
+                EventoPendente(id = eventoId, token = token, tipo = tipoLocal, decisaoLocal = decisaoLocal)
             )
+            SyncWorker.sincronizarAgora(context)
             return RespostaLeitura(
                 ok = true,
-                mensagem = if (tipo == TipoMovimento.saida) "SAIDA REGISTADA (OFFLINE)"
-                else "EVENTO GUARDADO OFFLINE — VERIFICACAO PENDENTE",
-                resultado = if (tipo == TipoMovimento.saida) "permitido" else "pendente_autorizacao",
-                tipo = tipo.name,
+                mensagem = "GUARDADO OFFLINE — sincroniza quando houver rede",
+                resultado = "pendente_autorizacao",
+                tipo = tipoLocal,
                 offline = true
             )
         }
@@ -71,7 +73,7 @@ class SupabaseRepo(private val context: Context) {
                 put("p_evento_id", eventoId)
                 put("p_token", token)
                 put("p_codigo", token)
-                put("p_tipo", tipo.name)
+                put("p_tipo", tipoEnvio)
                 put("p_ocorrido_em", Instant.now().toString())
                 put("p_offline", false)
                 if (decisaoLocal != null) put("p_decisao_local", decisaoLocal)
@@ -79,14 +81,16 @@ class SupabaseRepo(private val context: Context) {
             val r = parseResposta(client.postgrest.rpc("registar_leitura", params).data)
             r.copy(fotoPath = resolverFotoUrl(r.fotoPath))
         }.getOrElse {
+            val tipoLocal = if (tipo == TipoMovimento.auto) TipoMovimento.entrada.name else tipo.name
             db.eventoDao().inserir(
-                EventoPendente(id = eventoId, token = token, tipo = tipo.name, decisaoLocal = decisaoLocal)
+                EventoPendente(id = eventoId, token = token, tipo = tipoLocal, decisaoLocal = decisaoLocal)
             )
+            SyncWorker.sincronizarAgora(context)
             RespostaLeitura(
                 ok = true,
-                mensagem = "EVENTO GUARDADO OFFLINE — VERIFICACAO PENDENTE",
+                mensagem = "GUARDADO OFFLINE — sincroniza quando houver rede",
                 resultado = "pendente_autorizacao",
-                tipo = tipo.name,
+                tipo = tipoLocal,
                 offline = true
             )
         }
