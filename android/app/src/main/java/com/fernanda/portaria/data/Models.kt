@@ -4,7 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
 
-enum class TipoMovimento { entrada, saida }
+/** auto = servidor decide entrada/saida conforme ultimo movimento */
+enum class TipoMovimento { auto, entrada, saida }
 
 @Entity(tableName = "eventos_pendentes")
 data class EventoPendente(
