@@ -12,8 +12,8 @@ android {
         applicationId = "com.fernanda.portaria"
         minSdk = 26
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.4.0"
+        versionCode = 5
+        versionName = "1.5.0"
         buildConfigField("String", "SUPABASE_URL", "\"https://blfmtlselqhdpnowpuqj.supabase.co\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"sb_publishable_Qv-rc2IuTagnhnYnVhKeqA_UT8bv3uK\"")
     }
@@ -83,4 +83,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 }
